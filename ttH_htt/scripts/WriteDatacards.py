@@ -149,7 +149,7 @@ if tH_kin :
 
 try :
     print ( "proc_to_remove: listed by hand in configs/list_channels.py" )
-    print (list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
+    print (list_channel_opt[channel]["proc_to_remove"])
 except :
     removeProcs = False
     print ( "do not remove any process listed by hand" )
@@ -163,10 +163,10 @@ if len(removeProcslist):
         print("Removing processes where integral is below certain threshold" + str(removeProcslist))
         higgs_procs_plain = list(set(list(higgs_procs_plain)) - set(list(removeProcslist)))
         print ("New list of Higgs processes", higgs_procs_plain)
-        print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)])
+        print ("Removed", str(removeProcslist))
         bkg_procs_from_MC = list(set(list(bkg_procs_from_MC)) - set(list(removeProcslist)))
         print ("New list of bkg processes", bkg_procs_from_MC)
-        print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
+        print ("Removed", str(removeProcslist))
 
 pT_bins = {}
 if stxs :
