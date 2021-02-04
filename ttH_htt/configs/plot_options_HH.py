@@ -82,8 +82,9 @@ def options_plot (analysis, channel, all_procs, leading_minor_H_local, leading_m
         if channel in ["2l_0tau"] and not leading_minor_H_local =="HH" :
             del dprocs[fakes]
             dprocs[fakes]                                 = {"color" :   1, "fillStype" : 3005, "label" : "Fakes"        , "make border" : True}
-            #del dprocs["DY"]
             dprocs["DY"]                                  = {"color" : 221, "fillStype" : 1001, "label" : "DY"         , "make border" : True}
+            del dprocs["ST"]
+            dprocs["ST"]           = {"color" : 212, "fillStype" : 1001, "label" : 'ST'   , "make border" : True}
             del dprocs["TT"]
             dprocs["TT"]                                  = {"color" : 17, "fillStype" : 1001, "label" : 't#bar{t} + jets'   , "make border" : True}
         if channel in ["1l_0tau"] and not leading_minor_H_local =="HH" :
@@ -142,9 +143,9 @@ def list_channels_draw(analysis) :
     info_channel = {
     "2l_0tau"   : {
         "bkg_proc_from_data" : [fakes       ],
-        "bkg_procs_from_MC"  : [ "TT", "ST", "Convs", "TTH", "TH", "TTZ", "TTW", "TTWW", "TT", "Other", "WH", "ZH", "DY", "W", "WW", "WZ", "ZZ", "qqH", "ggH"], #
+        "bkg_procs_from_MC"  : [ "TT", "ST",  "ttH", "TH", "VV", "Other_bbWW", "WH", "ZH", "ggH", "qqH", "DY", "WJets"],
         "signal" : [], # "signal_ggf_nonresonant_hh_bbttSM", "signal_ggf_nonresonant_hh_bbvv_slSM", "signal_ggf_nonresonant_hh_bbvvSM"
-        "signal_HH" : ["signal_ggf_nonresonant_hh_bbttSM", "signal_ggf_nonresonant_hh_bbvv_slSM", "signal_ggf_nonresonant_hh_bbvvSM"], #
+        "signal_HH" : ["signal_ggf_nonresonant_hh_bbttkl_1p00", "signal_ggf_nonresonant_hh_bbvv_slkl_1p00", "signal_ggf_nonresonant_hh_bbvvkl_1p00"], #
         "leading_minor_H" : "TH", ## The legend for the mino H proc will only appear if this process is in the card
         "leading_minor_tH" : "tHq_htt" ## The legend for the mino H proc will only appear if this process is in the card
         },
