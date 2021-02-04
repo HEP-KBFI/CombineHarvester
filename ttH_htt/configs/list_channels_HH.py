@@ -120,7 +120,7 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
     info_channel = {
         "2l_0tau" : {
             "bkg_proc_from_data" : [ fakes    ],
-            "bkg_procs_from_MC"  : ["Convs", "TTZ", "TTW", "TTWW", "TT", "Other_bbWW", "DY", "WJets", "WW", "WZ", "ZZ", "qqZZ", "ggZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : ["TT", "ST", "Other_bbWW", "DY", "WJets", "VV"] + higgs_procs_w_BR,
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
