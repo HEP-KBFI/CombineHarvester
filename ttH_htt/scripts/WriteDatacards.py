@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 import os.path
 from os import path
 
-from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_systematics, rescale_stxs_pT_bins
+from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_integral, check_systematics, rescale_stxs_pT_bins
 sys.stdout.flush()
 
 from optparse import OptionParser
@@ -40,6 +40,7 @@ parser.add_option("--HHtype",         type="string",       dest="HHtype",      h
 parser.add_option("--renamedHHInput", action="store_true", dest="renamedHHInput",   help="If used input already renamed.", default=True)
 parser.add_option("--isCR", action="store_true", dest="isCR",   help="If datacard is created for an CR.", default=False)
 parser.add_option("--withCR", action="store_true", dest="withCR",   help="If datacard is created for use with CR.", default=False)
+parser.add_option("--subcat",    type="string",       dest="subcat", help="subcategory to be considered for proceeses to remove ", default="")
 
 (options, args) = parser.parse_args()
 
@@ -68,6 +69,7 @@ forceModifyShapes      = options.forceModifyShapes
 renamedHHInput         = options.renamedHHInput
 isCR = options.isCR
 withCR = options.withCR
+subcat = options.subcat
 # output the card
 if options.output_file == "none" :
     output_file = (cardFolder + "/" + str(os.path.basename(inputShapes)).replace(".root","").replace("prepareDatacards", "datacard")).replace("addSystFakeRate","datacard")
@@ -145,23 +147,26 @@ if tH_kin :
     print ("signal        (new): ", higgs_procs)
     higgs_procs_plain = sum(higgs_procs,[])
 
-removeProcs = True
 try :
     print ( "proc_to_remove: listed by hand in configs/list_channels.py" )
-    print (list_channel_opt[channel]["proc_to_remove"][str(era)])
+    print (list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
 except :
     removeProcs = False
     print ( "do not remove any process listed by hand" )
 
-if removeProcs :
-    removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)]
+removeProcslist = check_integral(inputShapesRaw, analysis)
+if len(removeProcslist):
+    #removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)][subcat]
     if not (coupling == "none" or coupling == "kt_1_kv_1") :
         removeProcslist = [nn.replace("tHq_", "tHq_%s_" % coupling).replace("tHW_", "tHW_%s_" % coupling) for nn in list(removeProcslist) if "tHW" in nn or "tHq" in nn]
     if len(removeProcslist) > 0 :
-        print("Removing processes where systematics blow up (found by hand a posteriory using the list hardcoded on configs/list_channels.py)")
+        print("Removing processes where integral is below certain threshold" + str(removeProcslist))
         higgs_procs_plain = list(set(list(higgs_procs_plain)) - set(list(removeProcslist)))
         print ("New list of Higgs processes", higgs_procs_plain)
         print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)])
+        bkg_procs_from_MC = list(set(list(bkg_procs_from_MC)) - set(list(removeProcslist)))
+        print ("New list of bkg processes", bkg_procs_from_MC)
+        print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
 
 pT_bins = {}
 if stxs :
@@ -208,7 +213,7 @@ if shape :
         if analysis == "ttH":
             check_systematics(inputShapes, coupling)
         else:
-            check_systematics(inputShapes, coupling, analysis)
+            check_systematics(inputShapes, coupling, analysis, True)
     else :
         print ("file %s already modified" % inputShapes)
 else :
