@@ -126,7 +126,7 @@ def options_plot_ranges (analysis) :
                 },
             "1l_0tau" : {
                 "minY" : 0.01,    "maxY" :  10000000000.,
-                "minYerr": -1.02, "maxYerr" : 1.02,
+                "minYerr": -0.2, "maxYerr" : 0.2,
                 "useLogPlot" : True,
                 "label" : 'HH bbWW 1l ',
                 "labelX" : "BDT bin#",
