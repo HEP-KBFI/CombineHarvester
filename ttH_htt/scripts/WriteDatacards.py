@@ -146,17 +146,17 @@ if tH_kin :
     print ("BKG from MC   (new): ", bkg_procs_from_MC)
     print ("signal        (new): ", higgs_procs)
     higgs_procs_plain = sum(higgs_procs,[])
-
+removeProcs = True
 try :
     print ( "proc_to_remove: listed by hand in configs/list_channels.py" )
-    print (list_channel_opt[channel]["proc_to_remove"])
+    print (list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
 except :
     removeProcs = False
     print ( "do not remove any process listed by hand" )
 
-removeProcslist = check_integral(inputShapesRaw, analysis)
-if len(removeProcslist):
-    #removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)][subcat]
+#removeProcslist = check_integral(inputShapesRaw, analysis)
+if removeProcs:
+    removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)][subcat]
     if not (coupling == "none" or coupling == "kt_1_kv_1") :
         removeProcslist = [nn.replace("tHq_", "tHq_%s_" % coupling).replace("tHW_", "tHW_%s_" % coupling) for nn in list(removeProcslist) if "tHW" in nn or "tHq" in nn]
     if len(removeProcslist) > 0 :
@@ -372,12 +372,12 @@ for specific_syst in theory_ln_Syst :
     if "HH" in procs[0] and analysis == "HH":
         procs_hh = []
         for pr in higgs_procs_plain:
-            if procs[0] in pr: 
+            if procs[0] in pr:
                 procs_hh.append(pr)
         procs = procs + procs_hh
     elif "H" in procs[0] and analysis == "HH":
         procs_H = []
-        singlehiggs_proc_no_BR = ["TTH", "tHq","tHW", "WH","ZH","qqH", "ggH"]
+        singlehiggs_proc_no_BR = ["TTH", "ttH", "tHq","tHW", "WH","ZH","qqH", "ggH"]
         singlehiggs_procs_w_BR = []
         for proc in singlehiggs_proc_no_BR:
             singlehiggs_procs_w_BR.append(proc+"_hww")
@@ -386,8 +386,9 @@ for specific_syst in theory_ln_Syst :
             singlehiggs_procs_w_BR.append(proc+"_hbb")
             singlehiggs_procs_w_BR.append(proc+"_hgg")
         for pr in singlehiggs_procs_w_BR:
-            if procs[0] in pr: 
-                procs_H.append(pr)
+            for proc in procs:
+                if proc in pr:
+                    procs_H.append(pr)
         procs = procs + procs_H
     else :
         if procs[0] not in bkg_procs_from_MC :
@@ -633,7 +634,6 @@ if shape :
             print ("renamed " + MC_shape_syst_era_2 + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_3)
 
 ########################################
-
 if ( not ( signal_type == "none" and mass == "none" and HHtype == "none" )) and options.output_file=="none" :
     output_file =  "%s_%s_%s_%s" % (output_file, HHtype, signal_type, mass )
 
