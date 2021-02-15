@@ -38,7 +38,7 @@ theory_ln_Syst = {
     #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
     "QCDscale_tt" : {"value": (0.965 , 1.024),    "proc" : ["TT"]},
     "pdf_tt"      : {"value": 1.042,              "proc" : ["TT"]}, # includes alpha s
-    "m_top_unc_tt": {"value": 0.973/1.028,        "proc" : ["TT"]},
+    "m_top_unc_tt": {"value": 0.973,1.028,        "proc" : ["TT"]},
 
 #https://arxiv.org/pdf/1610.07922.pdf
     "QCDscale_ttZ" : {"value": (0.898 , 1.096),   "proc" : ["TTZ"]}, # old (0.887 , 1.096)
@@ -96,18 +96,18 @@ theory_ln_Syst = {
     "pdf_tHW"      : {"value": 1.063,            "proc" : ["tHW"]},
     "alfa_s_tHW"   : {"value": 1.015,            "proc" : ["tHW"]},
 #Andrew
-    "pdf_ggZZ"     : {"value": (0.85/1.236),     "proc" : ["ggZZ"]}, # old (0.823/1.236)
-    "QCDscale_ggZZ": {"value": 1.173,             "proc" : ["ggZZ"]},
-    "pdf_qqZZ"     : {"value": (0.9869/1.0208),   "proc" : ["qqZZ"]},  # old (0.9868/1.0208)
+    "QCDscale_ggZZ"     : {"value": (0.85,1.236),     "proc" : ["ggZZ"]}, # old (0.823,1.236)
+    "pdf_ggZZ": {"value": 1.173,             "proc" : ["ggZZ"]},
+    "QCDscale_qqZZ"     : {"value": (0.9869,1.0208),   "proc" : ["qqZZ"]},  # old (0.9868,1.0208)
     #"EW_corr_ggZ" : {"value": 1.,                "proc" : ["ggZZ"]}, # ?
-    "QCDscale_qqZZ": {"value": 1.0314,            "proc" : ["qqZZ"]},
+    "pdf_qqZZ": {"value": 1.0314,            "proc" : ["qqZZ"]},
    # "EW_corr_qqZZ : {"value": 1.,                "proc" : ["qqZZ"]},# ?
-    "pdf_WZ"       : {"value": (0.968/1.038),     "proc" : ["WZ"]}, #old (0.967/1.038) 
-    "QCDscale_WZ"  : {"value": 1.014,             "proc" : ["WZ"]},
+    "QCDscale_WZ"       : {"value": (0.968,1.038),     "proc" : ["WZ"]}, #old (0.967,1.038) 
+    "pdf_WZ"  : {"value": 1.014,             "proc" : ["WZ"]},
 # other WZ/ZZ
 
     "CMS_WZ_theo"  : {"value" : 1.07,             "proc" : ["WZ"]},
-    "pdf_VV"       : {"value" : 0.180837/0.253523,"proc" : ["VV"]},
+    "pdf_VV"       : {"value" : 0.180837,0.253523,"proc" : ["VV"]},
     "QCDscale_VV"  : {"value" : 0.317419,         "proc" : ["VV"]},
     }
 
