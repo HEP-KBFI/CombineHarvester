@@ -321,6 +321,17 @@ def check_integral( inputShapesL, analysis) :
     tfileout.Close()
     return procs_to_remove
 
+def makeBinContentPositive(hists):
+    for hist in hists:
+        for bin in range(1, hist.GetNbinsX()+1):
+            if hist.GetBinContent(bin) <0:
+                bincont = hist.GetBinContent(bin)
+                newbincont = 0
+                binerror2 = pow(hist.GetBinError(bin), 2)
+                newbinerror = math.sqrt(binerror2 + pow((bincont-newbincont), 2))
+                hist.SetBinContent(bin, newbincont)
+                hist.SetBinError(bin, newbinerror)
+
 def check_systematics (inputShapesL, coupling, analysis = "ttH", newmethod=False) :
     if coupling == "none" :
         print ("Not doing cards with couplings, skping to modify all shapes with 'kt' mark on it from tHq/tHW/HH")
@@ -440,6 +451,7 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH", newmethod=False
                         did_something_up = 1
                 if "FRjt_shape" in name_up and "data_fakes" in name_up:
                     print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+            makeBinContentPositive([histo_up, nominal, histo_do])
             if did_something_nom == 1 or did_something_up == 1 or did_something_do == 1 :
                 print ("modified syst templates in ", name_syst, " in process: ", name_nominal, " nom/up/do = ", did_something_nom,  did_something_up, did_something_do)
                 #if analysis == 'HH' and 'HH' not in name_nominal:
@@ -455,7 +467,6 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH", newmethod=False
         #    nominal  = tfileout.Get( obj.GetName() )
         #    nominal.Rebin(10)
         #    nominal.Write()
-
 
     tfileout.Close()
 
