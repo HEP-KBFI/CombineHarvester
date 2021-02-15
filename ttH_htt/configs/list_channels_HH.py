@@ -128,7 +128,32 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
             "bkg_proc_from_data" : [ fakes    ],
             "bkg_procs_from_MC"  : ["TT", "ST", "Other_bbWW", "DY", "WJets", "VV"] + higgs_procs_w_BR + thprocs_bbww,
             "isSMCSplit" : False,
-            "proc_to_remove" : {}
+            "proc_to_remove" : {#'2016' : {'W_resolved' : {'ggH_hbb', 'qqH_hbb'}, 'W_boosted' : {'WH_htt', 'ZH_htt', 'ZH_hzz'},\
+                                 #         'TT_boosted' : {'WH_hzz', 'ZH_hzz', 'ggH_hww'}, 'TT_resolved' : {'ZH_hzz', 'qqH_hbb', },\
+                                  #        'HH_resolved_2b_vbf' : {'WH_hzz', 'qqH_hww'}, 'HH_resolved_2b_nonvbf' : {'WH_htt', 'qqH_hbb'},\
+                                   #       'HH_resolved_1b' : {'ggH_hbb', 'ZH_hzz', 'WH_hzz', 'qqH_hbb'}, 'HH_boosted' : {'ggH_hbb', 'WH_htt'},\
+                                    #      'DY_resolved' : {'qqH_hbb', 'ZH_htt', 'WH_hzz', 'WH_htt', 'ggH_hbb'}, 'DY_boosted' : {'WH_htt', 'ZH_hzz'}},
+                                '2016' : {'W_resolved' : {'ggH_hbb', 'qqH_hbb'}, 'W_boosted' : {},\
+                                          'TT_boosted' : {}, 'TT_resolved' : {},\
+                                          'HH_resolved_2b_vbf' : {'WH_hzz'}, 'HH_resolved_2b_nonvbf' : {},\
+                                          'HH_resolved_1b' : {'ggH_hbb', 'ZH_hzz', 'WH_hzz'}, 'HH_boosted' : {'ggH_hbb'},\
+                                          'DY_resolved' : {'qqH_hbb', 'ZH_htt', 'WH_hzz', 'WH_htt', 'ggH_hbb'}},
+                                '2018' : {'W_resolved' : {'ggH_hbb', 'qqH_hbb', 'ZH_hzz'}, 'W_boosted' : {'WH_hzz', 'ZH_hzz', 'ZH_htt', 'ggH_hzz'},\
+                                          'TT_resolved' : {'ZH_hzz', 'qqH_hbb'}, 'TT_boosted' : {'TH_hzz', 'WH_htt', 'WH_hzz', 'ZH_htt', 'ggH_hww', 'ggH_hzz'},
+                                          'SingleTop_resolved' : {'WH_hzz', 'ZH_htt', 'ZH_hzz', 'ggH_hzz', 'qqH_hbb'}, 'SingleTop_boosted' : {'ggH_hbb', 'qqH_hbb', 'WH_htt', 'WH_hzz'},
+                                          'DY_boosted' : {'WH_hzz', 'ZH_htt'}, 'HH_resolved_2b_vbf' : {'WH_hzz', 'WH_hww'},
+                                           'HH_resolved_2b_nonvbf' : {'WH_htt', 'qqH_hbb'},
+                                          'HH_resolved_1b' : {'ggH_hbb', 'ZH_hzz', 'WH_hzz', 'qqH_hbb'}, 'HH_boosted' : {'ggH_hbb', 'WH_htt', 'ggH_hzz'},\
+                                          'DY_resolved' : {'qqH_hbb', 'ZH_htt', 'WH_hzz', 'WH_htt'},\
+                                          'Other' : {'ggH_hbb', 'qqH_hbb'}},
+                                '2017' : {'W_resolved' : {'ggH_hbb', 'qqH_hbb'}, 'W_boosted' : {'ZH_htt'},\
+                                          'HH_resolved_2b_vbf' : {'WH_hzz', 'WH_htt', 'WH_hww', 'ggH_hww', 'ggH_hzz'},\
+                                          'HH_resolved_1b' : {'ggH_hbb', 'ZH_hzz', 'WH_hzz'}, 'HH_boosted' : {'ggH_hbb', 'WH_htt', 'ZH_htt'},\
+                                          'HH_resolved_2b_nonvbf' : {'WH_hzz', 'ggH_hbb', 'qqH_hbb'},
+                                          'TT_boosted' : {'WH_htt', 'ggH_hww', 'ggH_hzz', 'qqH_hww'},
+                                          'SingleTop_resolved' : {'ggH_hbb', 'qqH_hbb'}, 'SingleTop_boosted' : {'ZH_htt', 'ggH_hzz'},
+                                          'DY_resolved' : {'qqH_hbb', 'ZH_htt', 'WH_hzz', 'WH_htt', 'ggH_hbb'}, 'DY_boosted' : {'WH_hzz', 'ZH_htt', 'ZH_hzz', 'ggH_hbb'}, \
+                                          'Other' : {'ZH_htt'}}}
         },
         "0l_4tau" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
