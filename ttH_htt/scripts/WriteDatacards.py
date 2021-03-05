@@ -16,7 +16,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--inputShapes",    type="string",       dest="inputShapes", help="Full path of prepareDatacards.root")
 parser.add_option("--channel",        type="string",       dest="channel",     help="Channel to assume (to get the correct set of syst)")
-parser.add_option("--cardFolder",     type="string",       dest="cardFolder",  help="Folder where to save the datacards (relative or full).\n Default: teste_datacards",  default="teste_datacards")
+parser.add_option("--cardFolder",     type="string",       dest="cardFolder",  help="Folder where to save the datacards (relative or full).\n Default: teste_datacards",  default=".")
 parser.add_option("--analysis",       type="string",       dest="analysis",    help="Analysis type = 'ttH' or 'HH' (to know what to take as Higgs procs and naming convention of systematics), Default ttH", default="ttH")
 parser.add_option("--output_file",    type="string",       dest="output_file", help="Name of the output file.\n Default: the same of the input, substituing 'prepareDatacards' by 'datacard' (+ the coupling if the --couplings is used)", default="none")
 parser.add_option("--coupling",       type="string",       dest="coupling",    help="Coupling to take in tH.\n Default: do for SM, do not add couplings on output naming convention", default="none")
@@ -40,6 +40,7 @@ parser.add_option("--HHtype",         type="string",       dest="HHtype",      h
 parser.add_option("--renamedHHInput", action="store_true", dest="renamedHHInput",   help="If used input already renamed.", default=True)
 parser.add_option("--isCR", action="store_true", dest="isCR",   help="If datacard is created for an CR.", default=False)
 parser.add_option("--withCR", action="store_true", dest="withCR",   help="If datacard is created for use with CR.", default=False)
+parser.add_option("--binByBin", action="store_true", dest="binByBin",   help="If direct bin per bin uncertainties shouzld be used instead of autoMC stats", default=False)
 
 (options, args) = parser.parse_args()
 
@@ -47,6 +48,7 @@ inputShapesRaw = options.inputShapes
 inputShapes = inputShapesRaw.replace(".root", "_mod.root")
 channel     = options.channel
 era         = options.era
+binByBin = options.binByBin
 shape       = options.shapeSyst
 analysis    = options.analysis
 cardFolder  = options.cardFolder
@@ -251,14 +253,21 @@ cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], higgs_procs_plain, cats, True)
 print ("Adding lumi syt uncorrelated/year")
 # check if we keep the lumis/era correlated or not
 cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_%s" % str(era), "lnN", ch.SystMap()(lumiSyst[era]))
-cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
-if era in [2017, 2018] :
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_LS",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BCC", "lnN", ch.SystMap()(lumi_13TeV_BCC[era]))
-if era in [2017, 2016] :
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BBD", "lnN", ch.SystMap()(lumi_2016_2017[era]))
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_DB",  "lnN", ch.SystMap()(lumi_13TeV_DB[era]))
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_GS",  "lnN", ch.SystMap()(lumi_13TeV_GS[era]))
+if (analysis != "ttH"):
+    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2016_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
+    if era in [2017, 2018] :
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2017_2018",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
+    if era in [2017, 2016] :
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+else:
+    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
+    if era in [2017, 2018] :
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_LS",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BCC", "lnN", ch.SystMap()(lumi_13TeV_BCC[era]))
+    if era in [2017, 2016] :
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BBD", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_DB",  "lnN", ch.SystMap()(lumi_13TeV_DB[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_GS",  "lnN", ch.SystMap()(lumi_13TeV_GS[era]))
 
 #######################################
 # FIXME: one of the syst is logUniform -- fix
@@ -500,7 +509,9 @@ for specific_syst in specific_ln_systs :
     if len(procs) == 0 :
         continue
     name_syst = specific_syst if specific_ln_systs[specific_syst]["renameTo"]==None else specific_ln_systs[specific_syst]["renameTo"]
+    if "CHANNEL" in name_syst: name_syst = name_syst.replace("CHANNEL",channel)
     if not specific_ln_systs[specific_syst]["correlated"] :
+        name_syst = name_syst.replace("Era",str(era))
         name_syst = specific_syst.replace("%sl" % analysis, "%sl%s" % (analysis, str(era - 2000)))
         # assuming that the syst for the HH analysis with have the label HHl
     if "lnU" in name_syst :
@@ -519,8 +530,9 @@ if list_channel_opt[channel]["isSMCSplit"] :
 
 ########################################
 # bin by bin stat syst
-cb.cp().SetAutoMCStats(cb, 10)
-
+if not binByBin:
+    cb.cp().SetAutoMCStats(cb, 10)
+  
 if noX_prefix :
     cb.cp().backgrounds().ExtractShapes(
         finalFile,
@@ -601,6 +613,8 @@ if shape :
                 MC_shape_syst_era_2 = MC_shape_syst_era.replace("CMS_ttHl", "CMS_ttHl%s" % str(era).replace("20","")).replace("Era", str(era))
             else:
                 MC_shape_syst_era_2 = MC_shape_syst_era.replace("Era", str(era))
+                if 'Clos' in MC_shape_syst_era_2 and analysis == "HH":
+                    MC_shape_syst_era_2 = MC_shape_syst_era_2+ "_" + channel
                 if 'CMS_btag' in MC_shape_syst_era_2:
                     if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2017_2018')
                     if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2017_2018')
@@ -609,10 +623,6 @@ if shape :
         else :
             MC_shape_syst_era_2 = MC_shape_syst_era
         ###################
-        if 'Clos' in specific_syst and analysis == "HH":
-            MC_shape_syst_era_2 = specific_syst+ "_" + channel
-            cb.cp().process(procs).RenameSystematic(cb, specific_syst, MC_shape_syst_era_2)
-            print ("renamed " + specific_syst + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_2)
         if specific_syst == "CMS_ttHl_trigger" :
             if channel in ["1l_2tau", "1l_1tau"] :
                 MC_shape_syst_era_3 = MC_shape_syst_era_2 + "_leptau"
@@ -632,6 +642,19 @@ if shape :
 if ( not ( signal_type == "none" and mass == "none" and HHtype == "none" )) and options.output_file=="none" :
     output_file =  "%s_%s_%s_%s" % (output_file, HHtype, signal_type, mass )
 
+if binByBin:
+    bbb = ch.BinByBinFactory()
+    bbb.SetAddThreshold(0.1).SetFixNorm(False)
+    #bbb.SetAddThreshold(0.1).SetMergeThreshold(0.5).SetFixNorm(True)
+    #bbb.MergeBinErrors(cb.cp().backgrounds())
+    bbb.AddBinByBin(cb.cp().backgrounds(),cb)
+    sysnames = cb.syst_name_set()
+    for sysname in sysnames:
+        if "CMS___" in sysname:
+            binname = sysname[sysname.find("bin"):]
+            process = sysname[sysname.find("13TeV_")+6:sysname.find("bin")-1]
+            newname="CMS_multilepton_mcStat_%s_%s_%s_%s"%(channel,era,process,binname)
+            cb.cp().process([process]).RenameSystematic(cb, sysname, newname)
 bins = cb.bin_set()
 for b in bins :
     print ("\n Output file: " + output_file + ".txt", b )

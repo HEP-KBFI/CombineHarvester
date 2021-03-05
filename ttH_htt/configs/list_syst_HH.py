@@ -5,11 +5,13 @@
 # syst: theory and from MC generators - taken correlated between all years (check if that is what we want to do)
 lumiSyst             = {2016: 1.022,          2017: 1.020,          2018: 1.015}
 lumi_2016_2017_2018  = {2016: 1.009,          2017: 1.008,          2018: 1.020}
-lumi_2017_2018       = {2017: 1.003,          2018: 1.004}
-lumi_13TeV_BCC       = {2017: 1.003,          2018: 1.002}
-lumi_2016_2017       = {2016: 1.008,          2017: 1.006}
-lumi_13TeV_DB        = {2016: 1.005,          2017: 1.005}
-lumi_13TeV_GS        = {2016: 1.004,          2017: 1.001}
+lumi_2017_2018       = {2017: 1.0042,         2018: 1.0028}
+lumi_2016_2017       = {2016: 1.0075,          2017: 1.0065}
+#lumi_2017_2018       = {2017: 1.003,          2018: 1.004}
+#lumi_2016_2017       = {2016: 1.008,          2017: 1.006}
+#lumi_13TeV_BCC       = {2017: 1.003,          2018: 1.002}
+#lumi_13TeV_DB        = {2016: 1.005,          2017: 1.005}
+#lumi_13TeV_GS        = {2016: 1.004,          2017: 1.001}
 
 vbf_dipole_ln_Syst = {
     "0l_4tau" : {"wwww": 1.,   "ttww":1.94, "tttt":0.93, "zzww":1.,    "ttzz":1.,    "zzzz":1.},
@@ -22,77 +24,77 @@ vbf_dipole_ln_Syst = {
 }
 
 Clos_m_norm_ln_Syst = {
-    "WZCR" : {"2016": (0.817,1.224) , "2017": (0.967,1.035), "2018": (0.827,1.209)},
-    "ZZCR" : {"2016": (0.969,1.032) , "2017": (0.935,1.069), "2018": (0.993,1.007)},
-    "2lss" : {"2016": (0.957,1.045) , "2017": (0.913,1.096), "2018": (0.906,1.104)},
-    "3l" : {"2016": (0.940,1.064) , "2017": (0.039,1.065), "2018": (0.871,1.148)}
+    "WZCR" : {"2016": 1.224 , "2017": 1.035, "2018": 1.209},
+    "ZZCR" : {"2016": 1.032 , "2017": 1.069, "2018": 1.007},
+    "2lss" : {"2016": 1.0586 , "2017": 1.0607, "2018": 1.0786},
+    "3l" : {"2016": 1.059 , "2017": 1.0687, "2018": 1.1383}
 }
 
 Clos_e_norm_ln_Syst = {
-    "WZCR" : {"2016": (0.874,1.144) , "2017": (0.791,1.264), "2018": (0.897,1.115)},
-    "ZZCR" : {"2016": (0.5,2.0) , "2017": (0.5,2.0), "2018": (0.5,2.0,)},
-    "2lss" : {"2016": (0.961,1.041) , "2017": (0.997,1.003), "2018": (0.954,1.048,)},
-    "3l" : {"2016": (0.956,1.046) , "2017": (0.917,1.091), "2018": (0.959,1.044)}
+    "WZCR" : {"2016": 1.144 , "2017": 1.264, "2018": 1.115},
+    "ZZCR" : {"2016": 2.0 , "2017": 2.0, "2018": 2.0},
+    "2lss" : {"2016": 1.0128 , "2017": 1.0054, "2018": 1.0002},
+    "3l" : {"2016": 1.0453 , "2017": 1.0944, "2018": 1.0485}
 }
 theory_ln_Syst = {
     #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
     "QCDscale_ttjets"             : {"value": (0.965 , 1.024),    "proc" : ["TT"]},
     "pdf_ttjets"                  : {"value": 1.042,               "proc" : ["TT"]}, # includes alpha s
-    "TopmassUnc_ttjets"           : {"value": 0.973/1.028,               "proc" : ["TT"]},
+    "TopmassUnc_ttjets"           : {"value": (0.973,1.028),               "proc" : ["TT"]},
 
 #https://arxiv.org/pdf/1610.07922.pdf
-    "QCDscale_ttZ"                : {"value": (0.898 , 1.096),    "proc" : ["TTZ"]}, # old (0.887 , 1.096)
-    "QCDscale_ttW"                : {"value": (0.897 , 1.129),    "proc" : ["TTW"]}, # old (0.885 , 1.129)
+    "QCDscale_ttZ"                : {"value": (0.887 , 1.096),    "proc" : ["TTZ"]}, # old (0.887 , 1.096) # mod 0.898 , 1.096
+    "QCDscale_ttW"                : {"value": (0.885 , 1.129),    "proc" : ["TTW"]}, # old (0.885 , 1.129) # mod 0.897 , 1.129
 
     "pdf_ttZ"                     : {"value": 1.04,              "proc" : ["TTZ"]},  # includes alpha s 
     "pdf_ttW"                     : {"value": 1.034,               "proc" : ["TTW"]},  
   
-    "EW_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0)
-    "EW_ttW"                      : {"value": (0.969,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0)
+    "EW_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
+    "EW_ttW"                      : {"value": (0.968,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
 
     #HH https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHXSWGHH#Current_recommendations_for_HH_c modify scale for coupling?
     "pdf_ggHH"                      : {"value": 1.021,               "proc" : ["ggHH"]},
-    "QCDscale_ggHH"                 : {"value": (0.952 , 1.022),     "proc" : ["ggHH"]}, # old (0.95 , 1.022)
+    "QCDscale_ggHH"                 : {"value": (0.95 , 1.022),     "proc" : ["ggHH"]}, # old (0.95 , 1.022) # mod 0.95 , 1.022
     "alfa_s_ggHH"                    : {"value": 1.021,              "proc" : ["ggHH"]},
-    "TopmassUnc_ggHH"               : {"value": 1.026,              "proc" : ["ggHH"]},
+    "m_top_unc_ggHH"               : {"value": 1.026,              "proc" : ["ggHH"]},
     "pdf_qqHH"                      : {"value": 1.021,               "proc" : ["qqHH"]}, # includes alpha s
-    "QCDscale_qqHH"                 : {"value": (0.996 , 1.003),     "proc" : ["qqHH"]}, # old (0.996 , 1.003)
-    # higgs https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV (mh = 125.09)
-    "alfa_s_ggH"                    : {"value": 1.025,              "proc" : ["ggH"]},
-    "pdf_ggH"                     : {"value": 1.018,              "proc" : ["ggH"]},
-    "QCDscale_ggH"                : {"value": (0.929 , 1.081),    "proc" : ["ggH"]}, # old (0.924 , 1.081)
+    "QCDscale_qqHH"                 : {"value": (0.9996 , 1.0003),     "proc" : ["qqHH"]}, # old (0.996 , 1.003) # mod 0.996 , 1.003
+    # higgs https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV (mh = 125.09) updated with combination recommendations (https://gitlab.cern.ch/hh/naming-conventions/-)
+    "alfa_s_ggH"                    : {"value": 1.026,              "proc" : ["ggH"]},
+    "pdf_ggH"                     : {"value": 1.019,              "proc" : ["ggH"]},
+    "QCDscale_ggH"                : {"value": 1.039,    "proc" : ["ggH"]}, # old (0.924 , 1.081) #mod 0.929 , 1.081
 
     "pdf_qqH"                     : {"value": 1.021,              "proc" : ["qqH"]},
-    "QCDscale_qqH"                : {"value": (0.962 , 1.03),      "proc" : ["qqH"]}, # (0.96 , 1.03)
+    "QCDscale_qqH"                : {"value": (0.997,1.004),      "proc" : ["qqH"]}, # (0.96 , 1.03) #mod 0.962 , 1.03
     "alfa_s_qqH"                    : {"value": 1.005,              "proc" : ["qqH"]},
 
-    "QCDscale_WH"                 : {"value": (0.952 , 1.07),      "proc" : ["WH"]}, # old (0.95 , 1.07)
+    "QCDscale_WH"                 : {"value": (0.993,1.005),      "proc" : ["WH"]}, # old (0.95 , 1.07) # mod 0.952 , 1.07
     "pdf_WH"                      : {"value": 1.017,              "proc" : ["WH"]},
     "alfa_s_WH"                    : {"value": 1.009,              "proc" : ["WH"]},
-    "QCDscale_ZH"                 : {"value": (0.963 , 1.03),    "proc" : ["ZH"]}, # (0.962 , 1.03)
+    "QCDscale_ZH"                 : {"value": (0.970,1.038),    "proc" : ["ZH"]}, # (0.962 , 1.03) # mod 0.963 , 1.03
     "pdf_ZH"                      : {"value": 1.013,              "proc" : ["ZH"]},
     "alfa_s_ZH"                    : {"value": 1.009,              "proc" : ["ZH"]},
 
-    "QCDscale_ttH"                : {"value": (0.916 , 1.058),    "proc" : ["TTH","ttH"]}, # old (0.908 , 1.058)
+    "QCDscale_ttH"                : {"value": (0.908,1.058),    "proc" : ["TTH","ttH"]}, # old (0.908 , 1.058) # mod 0.916 , 1.058
     "pdf_ttH"               : {"value": 1.03,              "proc" : ["TTH","ttH"]},
     "alfa_s_ttH"                    : {"value": 1.02,              "proc" : ["TTH","ttH"]},
 
-    "QCDscale_tHq"                : {"value": (0.872, 1.065),     "proc" : ["tHq"]}, # old (0.853, 1.065)
+    "QCDscale_tHq"                : {"value": (0.853, 1.065),     "proc" : ["tHq"]}, # old (0.853, 1.065) #mod 0.872, 1.065
     "pdf_tHq"                      : {"value": 1.035,               "proc" : ["tHq"]},
     "alfa_s_tHq"                    : {"value": 1.012,              "proc" : ["tHq"]},
 
-    "QCDscale_tHW"                : {"value": (0.937, 1.049),     "proc" : ["tHW"]}, # old (0.933, 1.049)
-    "pdf_tHW"                    : {"value": 1.063,              "proc" : ["tHW"]},
+    "QCDscale_tHW"                : {"value": (0.933, 1.049),     "proc" : ["tHW"]}, # old (0.933, 1.049) # mod 0.937, 1.049
+    "pdf_tHW"                    : {"value": 1.061,              "proc" : ["tHW"]},
     "alfa_s_tHW"                    : {"value": 1.015,              "proc" : ["tHW"]}, 
 #Andrew
-    "pdf_ggZZ"                      : {"value": (0.85/1.236),              "proc" : ["ggZZ"]}, # old (0.823/1.236)
-    "QCDscale_ggZZ"                 : {"value": 1.173,              "proc" : ["ggZZ"]},
-    "pdf_qqZZ"                      : {"value": (0.9869/1.0208),              "proc" : ["qqZZ"]}, # old (0.9868/1.0208)
+    "QCDscale_ggZZ"                      : {"value": (0.823,1.236),              "proc" : ["ggZZ"]}, # old (0.823,1.236) # mod 0.85,1.236
+    "pdf_ggZZ"                 : {"value": 1.173,              "proc" : ["ggZZ"]},
+    "QCDscale_qqZZ"                      : {"value": (0.9868,1.0208),              "proc" : ["qqZZ"]}, # old (0.9868,1.0208) # mod 0.9869,1.0208
     #"EW_corr_ggZZ"                 : {"value": 1.,              "proc" : ["ggZZ"]}, # ?
-    "QCDscale_qqZZ"                 : {"value": 1.0314,              "proc" : ["qqZZ"]},
+    "pdf_qqZZ"                 : {"value": 1.0314,              "proc" : ["qqZZ"]},
    # "EW_corr_qqZZ"                 : {"value": 1.,              "proc" : ["qqZZ"]},# ?
-    "pdf_WZ"                      : {"value": (0.968/1.038),              "proc" : ["WZ"]}, #old (0.967/1.038)
-    "QCDscale_WZ"                 : {"value": 1.014,              "proc" : ["WZ"]},
+    "QCDscale_WZ"                      : {"value": (0.967,1.038),              "proc" : ["WZ"]}, #old (0.967,1.038) #mod 0.968,1.038
+    "pdf_WZ"                 : {"value": 1.044,              "proc" : ["WZ"]},
 # other WZ/ZZ
 
     # "CMS_WZ_theo"            : {"value": 1.07,               "proc" : ["WZ"]},
@@ -125,23 +127,45 @@ higgsBR_exptl = {
     # "htthzz": 1.0319  #handled by single higgs decay uncert
 }
 
-## --- Values taken from LHCHXWG TWiki: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
+# ## --- Values taken from LHCHXWG TWiki: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
+# higgsBR_theo = {
+#     "hww" : 1.0154,
+#     "hzz" : 1.0154,
+#     "htt" : 1.0165,
+#     "hzg" : 1.0582,
+#     "hmm" : 1.0168,
+#     "hbb" : 1.0126,
+#     # "tttt" : 1.0330,
+#     # "zzzz" : 1.0308,
+#     # "wwww" : 1.0308,
+#     # "wwzz" : 1.0308,
+#     # "ttzz" : 1.0319,
+#     # "ttww" : 1.0319,
+#     "hwwhww": 1.0308, # renamed hww in main code
+#     "hzzhzz": 1.0308, # renamed hzz in main code
+#     "htthtt":1.0330, # renamed htt in main code
+#     # "htthww": 1.0319,
+#     # "hzzhww": 1.0308,
+#     # "htthzz": 1.0319
+# }
+
+## --- Values taken from combination recommendation: https://gitlab.cern.ch/hh/naming-conventions/-/tree/master
 higgsBR_theo = {
-    "hww" : 1.0154,
-    "hzz" : 1.0154,
-    "htt" : 1.0165,
+    "hww" : (0.9848,1.0153),
+    "hzz" : (0.9848,1.0153),
+    "htt" : (0.9837,1.0165),
     "hzg" : 1.0582,
     "hmm" : 1.0168,
-    "hbb" : 1.0126,
+    "hbb" : (0.9874,1.0124),
     # "tttt" : 1.0330,
     # "zzzz" : 1.0308,
     # "wwww" : 1.0308,
     # "wwzz" : 1.0308,
     # "ttzz" : 1.0319,
     # "ttww" : 1.0319,
-    "hwwhww": 1.0308, # renamed hww in main code
-    "hzzhzz": 1.0308, # renamed hzz in main code
-    "htthtt":1.0330, # renamed htt in main code
+    "hwwhww": (0.9696,1.0306), # renamed hww in main code
+    "hzzhzz": (0.9696,1.0306), # renamed hzz in main code
+    "htthtt":(0.9674,1.033), # renamed htt in main code
     # "htthww": 1.0319,
     # "hzzhww": 1.0308,
     # "htthzz": 1.0319
@@ -158,8 +182,10 @@ def specific_syst(analysis, list_channel_opt, channel="multilepton") :
         tHq_procs = ["tHq_htt", "tHq_hww", "tHq_hzz"]
         tHW_procs = ["tHW_htt", "tHW_hww", "tHW_hzz"]
         specific_ln_systs = {
-        "CMS_fakes"            : {"value" : 1.3,  "correlated"   : True,  "renameTo" : "CMS_%s_fakes"%channel, "proc" : ["%s_data_fakes"%channel],          "channels" : [k for k,v in list_channel_opt.items() if "%s_data_fakes"%channel  in v["bkg_proc_from_data"]]},  # for channels with "fakes_data"
-        "CMS_multilepton_FakeableID_lnU"   : {"value" : 1.5,  "correlated"   : True,  "renameTo" : None, "proc" : ["%s_data_fakes"%channel],           "channels" : ["1l_3tau", "3l_1tau"]},  #For channels with small changes to the tau selection not properly treated in the fake rate extraction 
+        "CMS_fakes_corr"            : {"value" : 1.2,  "correlated"   : True,  "renameTo" : "CMS_%s_fakes"%channel, "proc" : ["%s_data_fakes"%channel],          "channels" : [k for k,v in list_channel_opt.items() if "%s_data_fakes"%channel  in v["bkg_proc_from_data"]]},  # for channels with "fakes_data"
+       "CMS_fakes_uncorr"            : {"value" : 1.2,  "correlated"   : False,  "renameTo" : "CMS_%s_fakes_CHANNEL_Era"%channel, "proc" : ["%s_data_fakes"%channel],          "channels" : [k for k,v in list_channel_opt.items() if "%s_data_fakes"%channel  in v["bkg_proc_from_data"]]},  # for channels with "fakes_data"
+#        "CMS_multilepton_FakeableID_lnU"   : {"value" : 1.5,  "correlated"   : True,  "renameTo" : None, "proc" : ["%s_data_fakes"%channel],           "channels" : ["1l_3tau", "3l_1tau"]},  #For channels with small changes to the tau selection not properly treated in the fake rate extraction 
+        "CMS_multilepton_FakeableID"   : {"value" : 1.3,  "correlated"   : True,  "renameTo" : None, "proc" : ["%s_data_fakes"%channel],           "channels" : ["1l_3tau", "3l_1tau"]},  #For channels with small changes to the tau selection not properly treated in the fake rate extraction 
         "CMS_multilepton_QF"               : {"value" : 1.3,  "correlated"   : True,  "renameTo" : None, "proc" : ["%s_data_flips"%channel],          "channels" : [k for k,v in list_channel_opt.items() if "%s_data_flips"%channel  in v["bkg_proc_from_data"]]},  # for channels with "flips_data"
         "CMS_Convs"            : {"value" : 1.5,  "correlated"   : True,  "proc" : ["%s_Convs"%channel], "renameTo" : "CMS_%s_Convs"%channel, "channels" : [k for k,v in list_channel_opt.items() if "%s_Convs"%channel in v["bkg_procs_from_MC"]]},   # for channels with "conversions"
         "CMS_Other"           : {"value" : 1.5,  "correlated"   : True, "renameTo" : "CMS_%s_Other"%channel, "proc" : ["%s_Other"%channel],                  "channels" : [k for k,v in list_channel_opt.items() if "%s_Other"%channel in v["bkg_procs_from_MC"]]},            # for channels with WZ
@@ -182,7 +208,7 @@ def specific_syst(analysis, list_channel_opt, channel="multilepton") :
             "CMS_ttHl_trigger_2lssEE"   : {"correlated" : False, "renameTo" : "CMS_%s_trigger_ee_Era"%channel,  "proc" : "MCproc"                 , "channels" : [n for n in list(list_channel_opt.keys()) if (n in ["2lss", "2l_0tau"])]},
             "CMS_ttHl_trigger_2lssEMu"  : {"correlated" : False, "renameTo" : "CMS_multilepton_trigger_em_Era"   ,  "proc" : "MCproc"                 , "channels" : [n for n in list(list_channel_opt.keys()) if (n in ["2lss", "2l_0tau"])]},
             "CMS_ttHl_trigger_2lssMuMu" : {"correlated" : False, "renameTo" : "CMS_multilepton_trigger_mm_Era"    ,  "proc" : "MCproc"                 , "channels" : [n for n in list(list_channel_opt.keys()) if (n in ["2lss", "2l_0tau"])]},
-            "CMS_ttHl_l1PreFire"        : {"correlated" : False, "renameTo" : "CMS_%s_prefireProbability_Era"%channel ,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())}, # should be 2016/2017 not 2018, that is done on the main code
+            "CMS_ttHl_l1PreFire"        : {"correlated" : False, "renameTo" : "CMS_l1_ecal_prefiring_Era" ,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())}, # should be 2016/2017 not 2018, that is done on the main code
             # ################################### btag
             "CMS_ttHl_btag_HFStats1" : {"correlated" : False, "renameTo" : "CMS_btag_hfstats1_Era"     ,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
             "CMS_ttHl_btag_HFStats2" : {"correlated" : False, "renameTo" : "CMS_btag_hfstats2_Era"     ,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
@@ -228,13 +254,13 @@ def specific_syst(analysis, list_channel_opt, channel="multilepton") :
             "CMS_ttHl_FRjt_shape"           : {"correlated" : False, "renameTo" : "CMS_multilepton_FakeRate_jt_shape_Era" , "proc" : ["%s_data_fakes"%channel], "channels" : list(set(list(list_channel_opt.keys())) - set(["4l", "3l", "2lss", "ZZCR", "WZCR", "1l_0tau", "2l_0tau"]))},
             "CMS_ttHl_FRet_shift"           : {"correlated" : False, "renameTo" : "CMS_multilepton_FakeRate_et_shift_Era", "proc" : ["%s_data_fakes"%channel], "channels" : list(set(list(list_channel_opt.keys())) - set(["4l", "3l", "2lss", "ZZCR", "WZCR", "1l_0tau", "2l_0tau"]))},
             # ################# other
-            "CMS_ttHl_topPtReweighting"     : {"correlated" : True, "renameTo" : "CMS_%s_topPtReweighting"%channel, "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
-            "CMS_ttHl_UnclusteredEn"        : {"correlated" : True, "renameTo" : "CMS_%s_UnclusteredEn"%channel,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
-            "CMS_ttHl_pileup"               : {"correlated" : True, "renameTo" : "CMS_%s_pileup"%channel,  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
+            "CMS_ttHl_topPtReweighting"     : {"correlated" : True, "renameTo" : "CMS_top_pT_reweighting", "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
+            "CMS_ttHl_UnclusteredEn"        : {"correlated" : False, "renameTo" : "CMS_unclusteredEnergy_Era",  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
+            "CMS_ttHl_pileup"               : {"correlated" : False, "renameTo" : "CMS_pileup_Era",  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
             
             "CMS_ttHl_PS_TT_ISR"   : {"correlated" : True, "renameTo" : "CMS_%s_PS_TT_ISR"%channel, "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
             "CMS_ttHl_PS_TT_FSR"   : {"correlated" : True, "renameTo" : "CMS_%s_PS_TT_FSR"%channel, "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
-            "CMS_ttHl_JESHEM"       : {"correlated" : True,  "renameTo" : "CMS_%s_JESHEM"%channel  , "proc" : "MCproc"      , "channels" : list(set(list(list_channel_opt.keys())) - set(["3l", "1l_0tau", "2l_0tau"]))}, # only for 2018 -- that is set on the Writedatacards # Saswati: it is removed for bb1l as up histogram is absent
+            "CMS_ttHl_JESHEM"       : {"correlated" : True,  "renameTo" : "CMS_HEM_2018"  , "proc" : "MCproc"      , "channels" : list(set(list(list_channel_opt.keys())) - set(["3l", "1l_0tau", "2l_0tau"]))}, # only for 2018 -- that is set on the Writedatacards # Saswati: it is removed for bb1l as up histogram is absent
            # "CMS_ttHl_EWK_btag"     : {"correlated" : True, "renameTo" : "CMS_multilepton_EWK_btag"   , "proc" : ["WZ"], "channels" : list(set(list(list_channel_opt.keys())) - set(["0l_4tau"]))}, 
            # "CMS_ttHl_EWK_jet"      : {"correlated" : True, "renameTo" : "CMS_multilepton_EWK_jet"   , "proc" : ["WZ"], "channels" : [k for k,v in list_channel_opt.items() if "WZ" in v["bkg_procs_from_MC"] or "ZZ" in v["bkg_procs_from_MC"]]}, ## added only on SRs atm 
 

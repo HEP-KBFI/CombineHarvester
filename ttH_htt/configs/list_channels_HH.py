@@ -16,9 +16,8 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
             decays_hh = ["hbbhww", "hbbhtt", "hbbhzz"]
             decays_hh_vbf = ["hbbhtt", "hbbhww", 'hbbhzz']
         elif HHtype == "multilepton" :
-            decays_hh = ["hwwhww","htthww","hzzhww","hzzhzz","htthtt","htthzz"]
-            decays_hh_vbf = ["hwwhww","htthww","hzzhww","hzzhzz","htthzz","htthtt"] # "htautauhtautau"
-            
+            decays_hh = ["hwwhww","htthww","hzzhww","htthtt","htthzz"]
+            decays_hh_vbf = ["hwwhww","htthww","htthtt"] # "htautauhtautau"
         elif HHtype == "bbWW_bbtt" :
             decays_hh = ["hbb_htt"]
             decays_hh_vbf = ["hbb_htt"]
@@ -115,6 +114,8 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
         fakes       = "data_fakes"
         flips       = "data_flips"
 
+    bgProcsMultileptonBase = ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR 
+    bgProcsMultileptonCR = ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_proc_no_BR 
     info_channel = {
         "2l_0tau" : {
             "bkg_proc_from_data" : [ fakes    ],
@@ -130,55 +131,55 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
         },
         "0l_4tau" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["tHW_htt"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "1l_3tau" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["qqH_hzz"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "2lss" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes , 'multilepton_' + flips],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["WW","ZH_hzz","ggH_hww","ZH_hww","tHq_hzz","tHW_hzz"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "2l_2tau" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in [""]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "3l" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["ggH_hww","ZH_hbb","ZH_htt"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "3l_1tau" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ZZ", "ggZZ", "qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["tHW_hzz"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "4l" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_procs_w_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonBase if item not in ["ttH_hzz","tHW_hzz","tHW_htt","ggH_hzz","qqH_hzz"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "WZCR" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_proc_no_BR,
+            "bkg_procs_from_MC"  : bgProcsMultileptonCR,
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         },
         "ZZCR" : {
             "bkg_proc_from_data" : [ 'multilepton_' + fakes    ],
-            "bkg_procs_from_MC"  : ["multilepton_Convs", "TTZ", "TTW", "TTWW", "TT", "multilepton_Other", "DY", "W", "WW", "WZ", "ggZZ","qqZZ"] + higgs_proc_no_BR,
+            "bkg_procs_from_MC"  : [item for item in bgProcsMultileptonCR if item not in ["tHq","ggH","qqH","WH"]],
             "isSMCSplit" : False,
             "proc_to_remove" : {}
         }
