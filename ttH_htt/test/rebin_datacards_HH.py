@@ -48,7 +48,7 @@ parser.add_option(
     )
 parser.add_option(
     "--HHtype",         type="string",       dest="HHtype",
-    help="Options: \"bbWW\" | \"multilep\" ",
+    help="Options: \"bbWW\" | \"multilep\" | \"bbWWsl\" | \"bbWWdl\" ",
     default="bbWW"
     )
 parser.add_option(
@@ -153,7 +153,8 @@ for nn, source in enumerate(sources) :
     cmd += " --signal_type %s "      % signal_type
     cmd += " --mass %s "             % mass
     cmd += " --HHtype %s "           % HHtype
-    #cmd += " --shapeSyst %s --forceModifyShapes "        % shape
+    if shape:
+        cmd += " --shapeSyst %s --forceModifyShapes "        % shape
     log_datacard = "%s_datacard.log" % source
     runCombineCmd(cmd, ".", log_datacard)
 
@@ -332,7 +333,7 @@ for nn, sourceL in enumerate(sourcesCards) :
                 #cmd += " --unblind  "
                 cmd += " --signal_type %s "      % signal_type
                 cmd += " --mass %s "             % mass
-                cmd += " --HHtype %s "           % HHtype
+                cmd += " --HHtype %s --do_bottom"           % HHtype
                 plotlog = "%s/%s_plot.log" % (savePlotsOn, fileCardOnlynBinL)
                 runCombineCmd(cmd, '.', plotlog)
 

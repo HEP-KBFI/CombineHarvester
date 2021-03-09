@@ -293,8 +293,80 @@ def rescale_stxs_pT_bins (inputShapesI, stxs_pT_bins, era) :
             nominal.Write()
             print ("rescaled ", key, obj_name, factor, nominal.Integral(), obj.Integral())
     tfileout1.Close()
+def check_integral( inputShapesL, analysis) :
+    procs_to_remove = []
+    tfileout = ROOT.TFile(inputShapesL)
+    tfileout.cd()
+    data_obs = tfileout.Get('data_obs')
+    try:
+        total_data = data_obs.Integral()
+    except:
+        print ("There was no data_obs histo in", inputShapesL)
+        sys.exit()
+    for nkey, key in enumerate(tfileout.GetListOfKeys()) :
+        obj =  key.ReadObj()
+        obj_name = key.GetName()
+        if type(obj) is not ROOT.TH1F and type(obj) is not ROOT.TH1D and type(obj) is not ROOT.TH1 and type(obj) is not ROOT.TH1S and type(obj) is not ROOT.TH1C :
+            continue
+        if "Down" in obj_name :
+            name_nominal = obj_name.split("_CMS")[0]
+            nominal  = tfileout.Get( name_nominal )
+            if name_nominal in procs_to_remove:
+                continue
+            if nominal.Integral() < 0.0004*total_data:
+                if analysis == 'HH' and 'HH' not in name_nominal:
+                    procs_to_remove.append(nominal.GetName())
+                    print('adding process %s to remove from datacard, integral in data: %s, integral in process: %s' %\
+                          (name_nominal, str(total_data), str(nominal.Integral())))
+    tfileout.Close()
+    return procs_to_remove
 
-def check_systematics (inputShapesL, coupling, analysis = "ttH") :
+def filter_lowYieldProcs(inputShapesL, procs):
+    no_shapeProcs = []
+    procYields = {}
+    totalYield = 0.
+    tfilein = ROOT.TFile(inputShapesL)
+    tfilein.cd()
+    for nkey, key in enumerate(tfilein.GetListOfKeys()):
+        if key.GetName() not in procs:
+            continue
+        hist = key.ReadObj()
+        procYields[key.GetName()]=hist.Integral()
+        totalYield = totalYield + hist.Integral()
+    for p in procs:
+        if procYields[p]/totalYield<0.01:
+            no_shapeProcs.append(p)
+    return no_shapeProcs
+
+def filterSig(inputShapesL, procs, threshold):
+    procYields = {}
+    totalYield = 0.
+    tfilein = ROOT.TFile(inputShapesL)
+    tfilein.cd()
+    for nkey, key in enumerate(tfilein.GetListOfKeys()):
+        if key.GetName() not in procs:
+            continue
+        hist = key.ReadObj()
+        procYields[key.GetName()]=hist.Integral()
+        totalYield = totalYield + hist.Integral()
+    for k in procYields.keys():
+        if procYields[k]/totalYield < threshold:
+            print "remove" ,k, "as its Yield is below", threshold, "of the total signal"
+            procs.remove(k)
+    return procs
+def makeBinContentPositive(hists):
+    for hist in hists:
+        for bin in range(1, hist.GetNbinsX()+1):
+            if hist.GetBinContent(bin) <0:
+                bincont = hist.GetBinContent(bin)
+                newbincont = 0
+                binerror2 = pow(hist.GetBinError(bin), 2)
+                newbinerror = math.sqrt(binerror2 + pow((bincont-newbincont), 2))
+                hist.SetBinContent(bin, newbincont)
+                hist.SetBinError(bin, newbinerror)
+    
+
+def check_systematics (inputShapesL, coupling, analysis = "ttH", newmethod=False) :
     if coupling == "none" :
         print ("Not doing cards with couplings, skping to modify all shapes with 'kt' mark on it from tHq/tHW/HH")
     ## it assumes no subdirectories in the preparedatacards file,
@@ -317,7 +389,7 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH") :
             continue
         #if "data_fakes" in obj_name: # FRjt_shape" in obj_name and
         #    print ("===========> TH1F type of ", obj_name)
-
+        
         if "Down" in obj_name :
             name_nominal = obj_name.split("_CMS")[0]
             name_up = obj_name.replace("Down", "Up")
@@ -365,22 +437,32 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH") :
                 if nominal.GetBinContent(binn) > 0 :
                     ## if up or do is zero fixe it
                     if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn) > 0) :
-                        histo_do.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)  )
+                        if newmethod:
+                            newbincont = nominal.GetBinContent(binn) - (histo_up.GetBinContent(binn) - nominal.GetBinContent(binn))
+                        else:
+                            newbincont = nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)
+                        histo_do.SetBinContent(binn, newbincont  )
+                        print "WARNING bin content for syst %s in do is zero while non-zero in nominal,up in process %s in bin %s" %( name_syst, name_nominal, str(binn))
                         # down = nominal / (up/nominal)
                         did_something_do = 1
                     if histo_up.GetBinContent(binn) == 0 and abs(histo_do.GetBinContent(binn)) > 0 :
-                        histo_up.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_do.GetBinContent(binn)  )
+                        if newmethod:
+                            newbincont = nominal.GetBinContent(binn) - (histo_do.GetBinContent(binn) - nominal.GetBinContent(binn))
+                        else:
+                            newbincont = nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_do.GetBinContent(binn)
+                        histo_up.SetBinContent(binn, newbincont  )
+                        print "WARNING bin content for syst %s in up is zero while non-zero in nominal,do in process %s in bin %s" %( name_syst, name_nominal, str(binn))
                         did_something_up = 1
                         # up = nominal/(down/nominal)
                     ##### then, deflate if too big
                     # if up/nom > 10: up = 10*nom
                     # if down/nom > 10: down = 10*nom
                     if histo_do.GetBinContent(binn)/nominal.GetBinContent(binn) > 100  :
-                        print "WARNING: big shift in template for syst template %s down in process %s : variation = %g"%( name_syst, name_nominal, histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
+                        print "WARNING: big shift in template for syst template %s down in process %s in bin %s : variation = %g"%( name_syst, name_nominal, str(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
                         histo_do.SetBinContent(binn, 100*nominal.GetBinContent(binn)  )
                         did_something_do = 1
                     if histo_up.GetBinContent(binn)/nominal.GetBinContent(binn) > 100 :
-                        print "WARNING: big shift in template for syst template %s up in process %s : variation = %g"%( name_syst, name_nominal, histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                        print "WARNING: big shift in template for syst template %s up in process %s in bin %s : variation = %g"%( name_syst, name_nominal, str(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
                         histo_up.SetBinContent(binn, 100*nominal.GetBinContent(binn) )
                         did_something_up = 1
                     #####
@@ -394,17 +476,21 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH") :
                     #    did_something_up = 1
                 else :
                     if nominal.GetBinContent(binn) == 0 and (abs(histo_do.GetBinContent(binn)) > 0 or  abs(histo_up.GetBinContent(binn)) > 0) :
-                        print ("WARNING, nominal is zero while up/do not; up/do = %s/%s. Setting nom/up/do 0.00001 " % (str(histo_do.GetBinContent(binn))  , str(histo_up.GetBinContent(binn))))
-                    histo_up.SetBinContent(binn, 0.00001 )
-                    nominal.SetBinContent(binn, 0.00001 )
-                    histo_do.SetBinContent(binn, 0.00001 )
-                    did_something_nom = 1
-                    did_something_do = 1
-                    did_something_up = 1
+                        print ("WARNING, nominal is zero while up/do not in bin %s; up/do = %s/%s. Setting nom/up/do 0.00001 " % (str(binn), str(histo_up.GetBinContent(binn))  , str(histo_do.GetBinContent(binn))))
+                        histo_up.SetBinContent(binn, 0.00001 )
+                        nominal.SetBinContent(binn, 0.00001 )
+                        histo_do.SetBinContent(binn, 0.00001 )
+                        did_something_nom = 1
+                        did_something_do = 1
+                        did_something_up = 1
                 if "FRjt_shape" in name_up and "data_fakes" in name_up:
-                    print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                    if nominal.GetBinContent(binn)>0:
+                        print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+            makeBinContentPositive([histo_up, nominal, histo_do])
             if did_something_nom == 1 or did_something_up == 1 or did_something_do == 1 :
                 print ("modified syst templates in ", name_syst, " in process: ", name_nominal, " nom/up/do = ", did_something_nom,  did_something_up, did_something_do)
+                #if analysis == 'HH' and 'HH' not in name_nominal:
+                 #   procs_to_remove.append(name_nominal)
                 #tfileout.cd(obj0_name)
                 histo_up.Write()
                 nominal.Write()
@@ -416,7 +502,6 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH") :
         #    nominal  = tfileout.Get( obj.GetName() )
         #    nominal.Rebin(10)
         #    nominal.Write()
-
 
     tfileout.Close()
 

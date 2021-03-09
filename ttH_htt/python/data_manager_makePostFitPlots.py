@@ -334,7 +334,7 @@ def do_hist_total_err(hist_total_err, labelX, total_hist, minBottom, maxBottom, 
     hist_total_err.GetYaxis().SetTitleOffset(1.2)
     hist_total_err.GetXaxis().SetTitleSize(0.14)
     hist_total_err.GetYaxis().SetTitleSize(0.075)
-    hist_total_err.GetYaxis().SetLabelSize(0.105)
+    hist_total_err.GetYaxis().SetLabelSize(0.090)
     hist_total_err.GetXaxis().SetLabelSize(0.10)
     hist_total_err.GetYaxis().SetTickLength(0.04)
     hist_total_err.GetXaxis().SetLabelColor(1)
@@ -350,7 +350,7 @@ def do_hist_total_err(hist_total_err, labelX, total_hist, minBottom, maxBottom, 
     for bin in xrange(0, allbins) :
         hist_total_err.SetBinContent(bin+1, 0)
         if total_hist.GetBinContent(bin+1) > 0. :
-            hist_total_err.SetBinError(bin + 1, total_hist.GetBinError(bin+1)/total_hist.GetBinContent(bin+1))
+          hist_total_err.SetBinError(bin + 1, total_hist.GetBinError(bin+1)/total_hist.GetBinContent(bin+1))
     return allbins
 
 def addLabel_CMS_preliminary(era) :

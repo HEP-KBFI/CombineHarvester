@@ -1,5 +1,5 @@
 def read_from(in_more_subcats, BDTfor):
-    withFolderL = True
+    withFolderL = False#True
     label  = "hh_bb1l_26Jul_baseline_TTSL_noWjj_dataMC"
 
     if in_more_subcats == "resolved_2b_vbf" :
@@ -85,7 +85,7 @@ def read_from(in_more_subcats, BDTfor):
 
     originalBinning=100
     nbinRegular = np.arange(15, 22)
-    nbinQuant = np.arange(10, 11, 5)
+    nbinQuant = np.arange(5, 10, 5)
 
     maxlim = 2.0
     minlim = 0.0
@@ -101,7 +101,7 @@ def read_from(in_more_subcats, BDTfor):
     "maxlim"          : maxlim,
     "minlim"          : minlim,
     "ch_nickname"     : ch_nickname,
-        "makePlotsBin"    : [45]
+        "makePlotsBin"    : [5]
     }
 
     return output

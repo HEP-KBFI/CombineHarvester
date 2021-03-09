@@ -58,6 +58,7 @@ def getQuantiles(histoP, ntarget, xmax) :
     for  ii in range(0,ntarget) :
         xq[ii] = (float(ii)/(ntarget))
     xq[ntarget] = 0.999999999
+    #xq = arr.array('d', [0, .16, .32, .48, .64, .80, .84, .88, .92, .96, .99999])
     histoP.GetQuantiles(ntarget, yq, xq)
     line = [None for point in range(ntarget)]
     line2 = [None for point in range(ntarget)]
@@ -71,9 +72,8 @@ def rebinHistogram_binindex(histogram) :
   histogram_rebinned = TH1F(histogram.GetName(), histogram.GetName(),  numBins, 0.5, numBins + 0.5)
   if not histogram_rebinned.GetSumw2N() : histogram_rebinned.Sumw2()
   histogram_rebinned.Reset()
-  for idxBin in range(0, numBins+1) : # CV: include underflow and overflow bins                                                                                                                             
+  for idxBin in range(1, numBins+1) : # CV: include underflow and overflow bins
     binContent = histogram.GetBinContent(idxBin)
-    print 'bincont=========== ', binContent, '\t', idxBin
     binError = histogram.GetBinError(idxBin)
     histogram_rebinned.SetBinContent(idxBin, binContent)
     histogram_rebinned.SetBinError(idxBin, binError)
@@ -93,6 +93,7 @@ def rebinRegular(
     nbin,
     BINtype,
     do_signalFlat,
+    merge_Wjets,
     originalBinning,
     doplots,
     bdtType,
@@ -137,6 +138,8 @@ def rebinRegular(
     #print ("enumerate(nbin): ",enumerate(nbin), ", nbin: ",nbin)
     isMoreThan02 = 0
     bin_isMoreThan02 = 0
+    nonOther = ["TT", 'WJets', 'DY', 'ST', 'data_obs', 'Fakes', 'fakes_mc']
+    if merge_Wjets: nonOther.remove('WJets')
     for nn,nbins in enumerate(nbin) :
         print ("nbins: %s" % nbins)
         file = TFile("%s.root" % histSource ,"READ");
@@ -164,6 +167,7 @@ def rebinRegular(
             print ("nkey: ",nkey,", keyF: ",keyF)
             if withFolder :
                 if partialCopy :
+                    print str(source), '\t', str(keyF.GetName())
                     if str(source) not in str(keyF.GetName()) : continue
                 obj =  keyF.ReadObj()
                 loop_on = obj.GetListOfKeys()
@@ -180,7 +184,8 @@ def rebinRegular(
                 loop_on = file.GetListOfKeys()
             print ("withFolder", withFolder)
             for keyO in loop_on :
-               print ("keys ", keyF.GetName(), keyO.GetName() )
+               #print ("keys ", keyF.GetName(), keyO.GetName() )
+               print ("keys ", keyO )
                if not withFolder :
                    #print "got histogram"
                    obj = keyO.ReadObj()
@@ -197,7 +202,7 @@ def rebinRegular(
                    print (h2.GetName(), h2.Integral())
                    if h2.GetName().find('CMS') == -1 and h2.GetName().find('HH') == -1 and h2.GetName().find('hh') == -1:
                        print 'name=========== ', h2.GetName()
-                       if h2.GetName() not in ["TT", 'W', 'DY', 'ST', 'data_obs', 'data_fakes', 'Convs', 'fakes_mc']:
+                       if h2.GetName() not in nonOther:
                            if "Other" not in hist_dict.keys() :
                                print 'other========= ', h2.GetName()
                                hist_dict["Other"] = h2
@@ -206,7 +211,8 @@ def rebinRegular(
                                print 'other===========', h2.GetName()
                                hist_dict["Other"].Add(h2)
                        else:
-                           hist_dict[h2.GetName()] = h2
+                           dictkey = h2.GetName().replace('WJets', 'W')
+                           hist_dict[dictkey] = h2
                factor=1.
                if  not h2.GetSumw2N() :
                    h2.Sumw2()

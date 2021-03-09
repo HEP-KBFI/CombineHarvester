@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 import os.path
 from os import path
 
-from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_systematics, rescale_stxs_pT_bins
+from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_integral, check_systematics, rescale_stxs_pT_bins, filter_lowYieldProcs, filterSig
 sys.stdout.flush()
 
 from optparse import OptionParser
@@ -41,7 +41,8 @@ parser.add_option("--renamedHHInput", action="store_true", dest="renamedHHInput"
 parser.add_option("--isCR", action="store_true", dest="isCR",   help="If datacard is created for an CR.", default=False)
 parser.add_option("--withCR", action="store_true", dest="withCR",   help="If datacard is created for use with CR.", default=False)
 parser.add_option("--binByBin", action="store_true", dest="binByBin",   help="If direct bin per bin uncertainties shouzld be used instead of autoMC stats", default=False)
-
+parser.add_option("--subcat",    type="string",       dest="subcat", help="subcategory to be considered for proceeses to remove ", default="")
+parser.add_option("--removeLowYieldShapes",        action="store_true", dest="removeLowYieldShapes",     help="Weather to aplly shape systematics for low Yield bkg or not", default=False)
 (options, args) = parser.parse_args()
 
 inputShapesRaw = options.inputShapes
@@ -65,11 +66,13 @@ HH_kin       = options.HH_kin
 signal_type  = options.signal_type
 mass         = options.mass
 HHtype       = options.HHtype
+removeLowYieldShapes = options.removeLowYieldShapes
 use_Exptl_HiggsBR_Uncs = options.use_Exptl_HiggsBR_Uncs
 forceModifyShapes      = options.forceModifyShapes
 renamedHHInput         = options.renamedHHInput
 isCR = options.isCR
 withCR = options.withCR
+subcat = options.subcat
 # output the card
 if options.output_file == "none" :
     output_file = (cardFolder + "/" + str(os.path.basename(inputShapes)).replace(".root","").replace("prepareDatacards", "datacard")).replace("addSystFakeRate","datacard")
@@ -112,9 +115,8 @@ bkg_procs_from_MC  = list_channel_opt[channel]["bkg_procs_from_MC"]
 # if a coupling is done read the tH signal with that coupling on naming convention
 if not (coupling == "none" or coupling == "kt_1_kv_1"):
     higgs_procs = [ [ entry.replace("tHq_", "tHq_%s_" % coupling).replace("tHW_", "tHW_%s_" % coupling) for entry in entries ] for entries in higgs_procs ]
-
-print higgs_procs
 higgs_procs_plain = sum(higgs_procs,[])
+
 print ("higgs_procs_plain", higgs_procs_plain)
 
 if only_ttH_sig :
@@ -146,24 +148,27 @@ if tH_kin :
     print ("BKG from MC   (new): ", bkg_procs_from_MC)
     print ("signal        (new): ", higgs_procs)
     higgs_procs_plain = sum(higgs_procs,[])
-
 removeProcs = True
 try :
     print ( "proc_to_remove: listed by hand in configs/list_channels.py" )
-    print (list_channel_opt[channel]["proc_to_remove"][str(era)])
+    print (list_channel_opt[channel]["proc_to_remove"][str(era)][subcat])
 except :
     removeProcs = False
     print ( "do not remove any process listed by hand" )
 
-if removeProcs :
-    removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)]
+#removeProcslist = check_integral(inputShapesRaw, analysis)
+if removeProcs:
+    removeProcslist = list_channel_opt[channel]["proc_to_remove"][str(era)][subcat]
     if not (coupling == "none" or coupling == "kt_1_kv_1") :
         removeProcslist = [nn.replace("tHq_", "tHq_%s_" % coupling).replace("tHW_", "tHW_%s_" % coupling) for nn in list(removeProcslist) if "tHW" in nn or "tHq" in nn]
     if len(removeProcslist) > 0 :
-        print("Removing processes where systematics blow up (found by hand a posteriory using the list hardcoded on configs/list_channels.py)")
+        print("Removing processes where integral is below certain threshold" + str(removeProcslist))
         higgs_procs_plain = list(set(list(higgs_procs_plain)) - set(list(removeProcslist)))
         print ("New list of Higgs processes", higgs_procs_plain)
-        print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)])
+        print ("Removed", str(removeProcslist))
+        bkg_procs_from_MC = list(set(list(bkg_procs_from_MC)) - set(list(removeProcslist)))
+        print ("New list of bkg processes", bkg_procs_from_MC)
+        print ("Removed", str(removeProcslist))
 
 pT_bins = {}
 if stxs :
@@ -210,20 +215,24 @@ if shape :
         if analysis == "ttH":
             check_systematics(inputShapes, coupling)
         else:
-            check_systematics(inputShapes, coupling, analysis)
+            check_systematics(inputShapes, coupling, analysis, True)
     else :
         print ("file %s already modified" % inputShapes)
 else :
     inputShapes = inputShapesRaw
 
+if analysis!="ttH":
+    higgs_procs_plain = filterSig(inputShapes,higgs_procs_plain, 0.001)
+
+
 # check a threshold on processes
 print ("do not add a process to datacard if the yield is smaller than 0.01 -- if so, do not add it")
 bkg_proc_from_data = make_threshold(0.01, bkg_proc_from_data,  inputShapes, tH_kin)
 bkg_procs_from_MC  = make_threshold(0.01, bkg_procs_from_MC, inputShapes, tH_kin)
-if analysis == "HH" and signal_type == "nonresLO":
+'''if analysis == "HH" and signal_type == "nonresLO":
     ## FIXME: to the ggHH and qqHH processes in NLO cards do not discard any component by threshold
     # by now it is not discarting any H process, narrow that down to ggHH and qqHH processes
-    higgs_procs_plain  = make_threshold(0.01, higgs_procs_plain, inputShapes, tH_kin)
+    higgs_procs_plain  = make_threshold(0.01, higgs_procs_plain, inputShapes, tH_kin)'''
 
 print ("final list of signal/bkg to add to datacards")
 MC_proc = higgs_procs_plain + bkg_procs_from_MC
@@ -234,6 +243,13 @@ print ("signal        (original): ", higgs_procs_plain)
 
 specific_syst_list = specific_syst(analysis, list_channel_opt, HHtype)
 print("analysis type        :", analysis)
+
+############
+bkg_procs_lowYield = []
+if removeLowYieldShapes:
+    bkg_procs_lowYield = filter_lowYieldProcs(inputShapes,bkg_proc_from_data+bkg_procs_from_MC)
+#############
+
 
 ###########################################
 # start the list of common systematics for all channels
@@ -376,12 +392,12 @@ for specific_syst in theory_ln_Syst :
     if "HH" in procs[0] and analysis == "HH":
         procs_hh = []
         for pr in higgs_procs_plain:
-            if procs[0] in pr: 
+            if procs[0] in pr:
                 procs_hh.append(pr)
         procs = procs + procs_hh
     elif "H" in procs[0] and analysis == "HH":
         procs_H = []
-        singlehiggs_proc_no_BR = ["TTH", "tHq","tHW", "WH","ZH","qqH", "ggH"]
+        singlehiggs_proc_no_BR = ["TTH", "ttH", "tHq","tHW", "WH","ZH","qqH", "ggH"]
         singlehiggs_procs_w_BR = []
         for proc in singlehiggs_proc_no_BR:
             singlehiggs_procs_w_BR.append(proc+"_hww")
@@ -390,8 +406,9 @@ for specific_syst in theory_ln_Syst :
             singlehiggs_procs_w_BR.append(proc+"_hbb")
             singlehiggs_procs_w_BR.append(proc+"_hgg")
         for pr in singlehiggs_procs_w_BR:
-            if procs[0] in pr: 
-                procs_H.append(pr)
+            for proc in procs:
+                if proc in pr:
+                    procs_H.append(pr)
         procs = procs + procs_H
     else :
         if procs[0] not in bkg_procs_from_MC :
@@ -477,6 +494,10 @@ if shape :
             continue
         if ("thu_shape_HH" in specific_syst and signal_type == "nonresLO"): # please fix
             continue
+        #print specific_syst,era,channel,"111ellllf"
+        if 'CMS_ttHl_FRjt_' in specific_syst and era==2016 and '0l_4tau' in channel:
+            print "Do not add",specific_syst, "as era is 2016 and channel is 0l_4tau" 
+            continue
         if channel not in specific_shape_systs[specific_syst]["channels"] :
             if ( "HEM" in specific_syst ) : print ("WTF", specific_shape_systs[specific_syst]["channels"])
             continue
@@ -495,8 +516,18 @@ if shape :
         # that above take the overlap of the lists
         if len(procs) == 0 :
             continue
-        cb.cp().process(procs).AddSyst(cb,  specific_syst, "shape", ch.SystMap()(1.0))
-        print ("added " + specific_syst + " as shape uncertainty to ", procs)
+        # remove low yield procs
+        procs_for_shape = []
+        for p in procs:
+            if p not in bkg_procs_lowYield:
+                procs_for_shape.append(p)
+            else:
+                print "Do not add ",specific_syst, "for ",p, "as its Yield is below 1%"
+        if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
+            print "remove", specific_syst, "from process ttH_htt inchannel 1l_3tau as it is 2018" 
+            procs_for_shape.remove('ttH_htt')
+        cb.cp().process(procs_for_shape).AddSyst(cb,  specific_syst, "shape", ch.SystMap()(1.0))
+        print ("added " + specific_syst + " as shape uncertainty to ", procs_for_shape)
 
 ########################################
 # Specific channels lnN syst
@@ -508,11 +539,12 @@ for specific_syst in specific_ln_systs :
     procs = list_proc(specific_ln_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
     if len(procs) == 0 :
         continue
-    name_syst = specific_syst if specific_ln_systs[specific_syst]["renameTo"]==None else specific_ln_systs[specific_syst]["renameTo"]
+    name_syst = specific_syst 
+    if specific_ln_systs[specific_syst]["renameTo"]: name_syst=specific_ln_systs[specific_syst]["renameTo"]
     if "CHANNEL" in name_syst: name_syst = name_syst.replace("CHANNEL",channel)
     if not specific_ln_systs[specific_syst]["correlated"] :
         name_syst = name_syst.replace("Era",str(era))
-        name_syst = specific_syst.replace("%sl" % analysis, "%sl%s" % (analysis, str(era - 2000)))
+        name_syst = name_syst.replace("%sl" % analysis, "%sl%s" % (analysis, str(era - 2000)))
         # assuming that the syst for the HH analysis with have the label HHl
     if "lnU" in name_syst :
         cb.cp().process(procs).AddSyst(cb,  name_syst, "lnU", ch.SystMap()(specific_ln_systs[specific_syst]["value"]))
@@ -589,6 +621,8 @@ if shape :
             continue
         if ("thu_shape_HH" in specific_syst and signal_type == "nonresLO"): # please fix
             continue
+        if 'CMS_ttHl_FRjt_' in specific_syst and era==2016 and '0l_4tau' in channel:
+            continue
         #################
         procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
         ##if("HEM" in specific_syst and signal_type == "nonresNLO"): # fix this!!!!
@@ -601,10 +635,17 @@ if shape :
         # that above take the overlap of the lists
         if len(procs) == 0 :
             continue
+        # remove low yield procs
+        procs_for_shape = []
+        for p in procs:
+            if p not in bkg_procs_lowYield:
+                procs_for_shape.append(p)
+        if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
+            procs_for_shape.remove('ttH_htt')
         #################
         if not specific_shape_systs[specific_syst]["renameTo"] == None :
             MC_shape_syst_era = specific_shape_systs[specific_syst]["renameTo"]
-            cb.cp().process(procs).RenameSystematic(cb, specific_syst, MC_shape_syst_era)
+            cb.cp().process(procs_for_shape).RenameSystematic(cb, specific_syst, MC_shape_syst_era)
             print ("renamed " + specific_syst + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era)
         else :
             MC_shape_syst_era = specific_syst
@@ -618,7 +659,7 @@ if shape :
                 if 'CMS_btag' in MC_shape_syst_era_2:
                     if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2017_2018')
                     if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2017_2018')
-            cb.cp().process(procs).RenameSystematic(cb, MC_shape_syst_era, MC_shape_syst_era_2)
+            cb.cp().process(procs_for_shape).RenameSystematic(cb, MC_shape_syst_era, MC_shape_syst_era_2)
             print ("renamed " + MC_shape_syst_era + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_2)
         else :
             MC_shape_syst_era_2 = MC_shape_syst_era
@@ -630,15 +671,14 @@ if shape :
                 MC_shape_syst_era_3 = MC_shape_syst_era_2 + "_tau"
             else :
                 MC_shape_syst_era_3 = MC_shape_syst_era_2 + "_" + channel
-            cb.cp().process(procs).RenameSystematic(cb, MC_shape_syst_era_2, MC_shape_syst_era_3)
+            cb.cp().process(procs_for_shape).RenameSystematic(cb, MC_shape_syst_era_2, MC_shape_syst_era_3)
             print ("renamed " + MC_shape_syst_era_2 + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_3)
         if  "Clos_t_norm" in specific_syst or  "Clos_t_shape" in specific_syst:
             MC_shape_syst_era_3 = MC_shape_syst_era_2 + "_" + channel
-            cb.cp().process(procs).RenameSystematic(cb, MC_shape_syst_era_2, MC_shape_syst_era_3)
+            cb.cp().process(procs_for_shape).RenameSystematic(cb, MC_shape_syst_era_2, MC_shape_syst_era_3)
             print ("renamed " + MC_shape_syst_era_2 + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_3)
 
 ########################################
-
 if ( not ( signal_type == "none" and mass == "none" and HHtype == "none" )) and options.output_file=="none" :
     output_file =  "%s_%s_%s_%s" % (output_file, HHtype, signal_type, mass )
 
