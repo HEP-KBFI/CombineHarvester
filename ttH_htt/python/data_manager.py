@@ -350,7 +350,7 @@ def filterSig(inputShapesL, procs, threshold):
         procYields[key.GetName()]=hist.Integral()
         totalYield = totalYield + hist.Integral()
     for k in procYields.keys():
-        if procYields[k]/totalYield < threshold:
+        if procYields[k]/totalYield < threshold and not ('qqHH' in k) :
             print "remove" ,k, "as its Yield is below", threshold, "of the total signal"
             procs.remove(k)
     return procs

@@ -519,13 +519,18 @@ if shape :
         # remove low yield procs
         procs_for_shape = []
         for p in procs:
+            if p is "ZH_htt" and era==2018 and channel=="2l_2tau":
+                continue
             if p not in bkg_procs_lowYield:
                 procs_for_shape.append(p)
             else:
                 print "Do not add ",specific_syst, "for ",p, "as its Yield is below 1%"
         if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
-            print "remove", specific_syst, "from process ttH_htt inchannel 1l_3tau as it is 2018" 
-            procs_for_shape.remove('ttH_htt')
+            if 'ttH_htt' in procs_for_shape:
+                print "remove", specific_syst, "from process ttH_htt inchannel 1l_3tau as it is 2018" 
+                procs_for_shape.remove('ttH_htt')
+            if 'ggHH_hzzhww' in procs_for_shape:
+                procs_for_shape.remove('ggHH_hzzhww')
         cb.cp().process(procs_for_shape).AddSyst(cb,  specific_syst, "shape", ch.SystMap()(1.0))
         print ("added " + specific_syst + " as shape uncertainty to ", procs_for_shape)
 
@@ -638,10 +643,16 @@ if shape :
         # remove low yield procs
         procs_for_shape = []
         for p in procs:
+            if p is "ZH_htt" and era==2018 and channel=="2l_2tau":
+                continue
             if p not in bkg_procs_lowYield:
                 procs_for_shape.append(p)
         if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
-            procs_for_shape.remove('ttH_htt')
+            if 'ttH_htt' in procs_for_shape:
+                print "remove", specific_syst, "from process ttH_htt inchannel 1l_3tau as it is 2018" 
+                procs_for_shape.remove('ttH_htt')
+            if 'ggHH_hzzhww' in procs_for_shape:
+                procs_for_shape.remove('ggHH_hzzhww')
         #################
         if not specific_shape_systs[specific_syst]["renameTo"] == None :
             MC_shape_syst_era = specific_shape_systs[specific_syst]["renameTo"]
