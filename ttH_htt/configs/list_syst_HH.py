@@ -48,42 +48,42 @@ theory_ln_Syst = {
     "pdf_ttZ"                     : {"value": 1.04,              "proc" : ["TTZ"]},  # includes alpha s 
     "pdf_ttW"                     : {"value": 1.034,               "proc" : ["TTW"]},  
   
-    "EW_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
-    "EW_ttW"                      : {"value": (0.968,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
+    "EW_corr_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
+    "EW_corr_ttW"                      : {"value": (0.968,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
 
     "pdf_ggHH"                      : {"value": 1.021,               "proc" : ["ggHH"]},
     "QCDscale_ggHH"                 : {"value": (0.95 , 1.022),     "proc" : ["ggHH"]}, # old (0.95 , 1.022) # mod 0.95 , 1.022
-    "alfa_s_ggHH"                    : {"value": 1.021,              "proc" : ["ggHH"]},
+    "alpha_s_ggHH"                    : {"value": 1.021,              "proc" : ["ggHH"]},
     "m_top_unc_ggHH"               : {"value": 1.026,              "proc" : ["ggHH"]},
     "pdf_qqHH"                      : {"value": 1.021,               "proc" : ["qqHH"]}, # includes alpha s
     "QCDscale_qqHH"                 : {"value": (0.9996 , 1.0003),     "proc" : ["qqHH"]}, # old (0.996 , 1.003) # mod 0.996 , 1.003
     # higgs https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV (mh = 125.09) updated with combination recommendations (https://gitlab.cern.ch/hh/naming-conventions/-)
-    "alfa_s_ggH"                    : {"value": 1.026,              "proc" : ["ggH"]},
+    "alpha_s_ggH"                    : {"value": 1.026,              "proc" : ["ggH"]},
     "pdf_ggH"                     : {"value": 1.019,              "proc" : ["ggH"]},
     "QCDscale_ggH"                : {"value": 1.039,    "proc" : ["ggH"]}, # old (0.924 , 1.081) #mod 0.929 , 1.081
 
     "pdf_qqH"                     : {"value": 1.021,              "proc" : ["qqH"]},
     "QCDscale_qqH"                : {"value": (0.997,1.004),      "proc" : ["qqH"]}, # (0.96 , 1.03) #mod 0.962 , 1.03
-    "alfa_s_qqH"                    : {"value": 1.005,              "proc" : ["qqH"]},
+    "alpha_s_qqH"                    : {"value": 1.005,              "proc" : ["qqH"]},
 
     "QCDscale_WH"                 : {"value": (0.993,1.005),      "proc" : ["WH"]}, # old (0.95 , 1.07) # mod 0.952 , 1.07
     "pdf_WH"                      : {"value": 1.017,              "proc" : ["WH"]},
-    "alfa_s_WH"                    : {"value": 1.009,              "proc" : ["WH"]},
+    "alpha_s_WH"                    : {"value": 1.009,              "proc" : ["WH"]},
     "QCDscale_ZH"                 : {"value": (0.970,1.038),    "proc" : ["ZH"]}, # (0.962 , 1.03) # mod 0.963 , 1.03
     "pdf_ZH"                      : {"value": 1.013,              "proc" : ["ZH"]},
-    "alfa_s_ZH"                    : {"value": 1.009,              "proc" : ["ZH"]},
+    "alpha_s_ZH"                    : {"value": 1.009,              "proc" : ["ZH"]},
 
     "QCDscale_ttH"                : {"value": (0.908,1.058),    "proc" : ["TTH","ttH"]}, # old (0.908 , 1.058) # mod 0.916 , 1.058
     "pdf_ttH"               : {"value": 1.03,              "proc" : ["TTH","ttH"]},
-    "alfa_s_ttH"                    : {"value": 1.02,              "proc" : ["TTH","ttH"]},
+    "alpha_s_ttH"                    : {"value": 1.02,              "proc" : ["TTH","ttH"]},
 
     "QCDscale_tHq"                : {"value": (0.853, 1.065),     "proc" : ["tHq"]}, # old (0.853, 1.065) #mod 0.872, 1.065
     "pdf_tHq"                      : {"value": 1.035,               "proc" : ["tHq"]},
-    "alfa_s_tHq"                    : {"value": 1.012,              "proc" : ["tHq"]},
+    "alpha_s_tHq"                    : {"value": 1.012,              "proc" : ["tHq"]},
 
     "QCDscale_tHW"                : {"value": (0.933, 1.049),     "proc" : ["tHW"]}, # old (0.933, 1.049) # mod 0.937, 1.049
     "pdf_tHW"                    : {"value": 1.061,              "proc" : ["tHW"]},
-    "alfa_s_tHW"                    : {"value": 1.015,              "proc" : ["tHW"]}, 
+    "alpha_s_tHW"                    : {"value": 1.015,              "proc" : ["tHW"]}, 
 #Andrew
     "QCDscale_ggZZ"                      : {"value": (0.823,1.236),              "proc" : ["ggZZ"]}, # old (0.823,1.236) # mod 0.85,1.236
     "pdf_ggZZ"                 : {"value": 1.173,              "proc" : ["ggZZ"]},

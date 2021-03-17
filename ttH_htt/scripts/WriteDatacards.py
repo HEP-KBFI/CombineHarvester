@@ -274,7 +274,7 @@ if (analysis != "ttH"):
     if era in [2017, 2018] :
         cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2017_2018",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
     if era in [2017, 2016] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2016_2017", "lnN", ch.SystMap()(lumi_2016_2017[era]))
 else:
     cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
     if era in [2017, 2018] :
