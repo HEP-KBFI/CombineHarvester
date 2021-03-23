@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 import os.path
 from os import path
 
-from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_integral, check_systematics, rescale_stxs_pT_bins, filter_lowYieldProcs, filterSig
+from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_integral, check_systematics, rescale_stxs_pT_bins, filter_lowYieldProcs, filterSig, filter_genuineShape
 sys.stdout.flush()
 
 from optparse import OptionParser
@@ -43,6 +43,7 @@ parser.add_option("--withCR", action="store_true", dest="withCR",   help="If dat
 parser.add_option("--binByBin", action="store_true", dest="binByBin",   help="If direct bin per bin uncertainties shouzld be used instead of autoMC stats", default=False)
 parser.add_option("--subcat",    type="string",       dest="subcat", help="subcategory to be considered for proceeses to remove ", default="")
 parser.add_option("--removeLowYieldShapes",        action="store_true", dest="removeLowYieldShapes",     help="Weather to aplly shape systematics for low Yield bkg or not", default=False)
+parser.add_option("--removeLowImpactShapes",        action="store_true", dest="removeLowImpactShapes",     help="Weather to remove shapes with small norm/shape effects or not", default=False)
 (options, args) = parser.parse_args()
 
 inputShapesRaw = options.inputShapes
@@ -67,6 +68,7 @@ signal_type  = options.signal_type
 mass         = options.mass
 HHtype       = options.HHtype
 removeLowYieldShapes = options.removeLowYieldShapes
+removeLowImpactShapes = options.removeLowImpactShapes
 use_Exptl_HiggsBR_Uncs = options.use_Exptl_HiggsBR_Uncs
 forceModifyShapes      = options.forceModifyShapes
 renamedHHInput         = options.renamedHHInput
@@ -522,7 +524,11 @@ if shape :
             if p is "ZH_htt" and era==2018 and channel=="2l_2tau":
                 continue
             if p not in bkg_procs_lowYield:
-                procs_for_shape.append(p)
+                upDoNom= [p + '_'+ specific_syst + 'Up', p + '_'+ specific_syst + 'Down',p]
+                if filter_genuineShape(inputShapes, upDoNom):# or (not removeLowImpactShapes):
+                    procs_for_shape.append(p)
+                else: 
+                    print"Do not add ",specific_syst, "for ",p, "as shape effect and yield effect are below 0.1%"
             else:
                 print "Do not add ",specific_syst, "for ",p, "as its Yield is below 1%"
         if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
@@ -620,6 +626,7 @@ if shape :
         #    continue
         if ( "HEM" in specific_syst ) and era != 2018 :
             print ("skkiping ", specific_syst, "as it is not era 2018")
+            continue
         if "HEM" in specific_syst and stxs :
             continue
         if specific_shape_systs[specific_syst]["correlated"] and specific_shape_systs[specific_syst]["renameTo"] == None :
@@ -646,7 +653,9 @@ if shape :
             if p is "ZH_htt" and era==2018 and channel=="2l_2tau":
                 continue
             if p not in bkg_procs_lowYield:
-                procs_for_shape.append(p)
+                upDoNom= [p + '_'+ specific_syst + 'Up', p + '_'+ specific_syst + 'Down',p]
+                if filter_genuineShape(inputShapes, upDoNom):# or (not removeLowImpactShapes):
+                    procs_for_shape.append(p)
         if 'CMS_ttHl_trigger' in specific_syst and era==2018 and '1l_3tau' in channel:
             if 'ttH_htt' in procs_for_shape:
                 print "remove", specific_syst, "from process ttH_htt inchannel 1l_3tau as it is 2018" 

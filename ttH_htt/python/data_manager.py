@@ -336,7 +336,32 @@ def filter_lowYieldProcs(inputShapesL, procs):
     for p in procs:
         if procYields[p]/totalYield<0.01:
             no_shapeProcs.append(p)
+    tfilein .Close()
     return no_shapeProcs
+
+def filter_genuineShape(inputShapesL, upDoNom):
+    tfilein = ROOT.TFile(inputShapesL)
+    tfilein.cd()
+    up=tfilein.Get(upDoNom[0])
+    do=tfilein.Get(upDoNom[1])
+    nom=tfilein.Get(upDoNom[2])
+    upInt = up.Integral()
+    doInt = do.Integral()
+    nomInt = nom.Integral()
+    sum1 = 0
+    sum2 = 0
+    for i in range(nom.GetNbinsX()):
+        up_I = up.GetBinContent(i+1)/upInt
+        do_I = do.GetBinContent(i+1)/doInt
+        nom_I = nom.GetBinContent(i+1)/nomInt
+        if up_I> 0 or nom_I>0:
+            sum1 = sum1 + 2*abs(up_I-nom_I)/abs(up_I+nom_I)
+        if do_I> 0 or nom_I>0:
+            sum2 = sum2 + 2*abs(do_I-nom_I)/abs(do_I+nom_I)
+    genShape = max(sum1,sum2)>0.001
+    yieldVar = max(abs(upInt-nomInt),abs(doInt-nomInt))/nomInt > 0.001
+    tfilein.Close()
+    return (yieldVar or genShape)
 
 def filterSig(inputShapesL, procs, threshold):
     procYields = {}
