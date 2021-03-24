@@ -677,8 +677,9 @@ if shape :
                 if 'Clos' in MC_shape_syst_era_2 and analysis == "HH":
                     MC_shape_syst_era_2 = MC_shape_syst_era_2+ "_" + channel
                 if 'CMS_btag' in MC_shape_syst_era_2:
-                    if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2017_2018')
-                    if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2017_2018')
+                    if not ('stats' in MC_shape_syst_era_2 or 'cferr' in MC_shape_syst_era_2):                        
+                        if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2017_2018')
+                        if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2017_2018')
             cb.cp().process(procs_for_shape).RenameSystematic(cb, MC_shape_syst_era, MC_shape_syst_era_2)
             print ("renamed " + MC_shape_syst_era + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_2)
         else :
