@@ -270,22 +270,22 @@ cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], higgs_procs_plain, cats, True)
 #######################################
 print ("Adding lumi syt uncorrelated/year")
 # check if we keep the lumis/era correlated or not
-cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_%s" % str(era), "lnN", ch.SystMap()(lumiSyst[era]))
+cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_%s" % str(era), "lnN", ch.SystMap()(lumiSyst[era]))
 if (analysis != "ttH"):
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2016_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
+    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2016_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
     if era in [2017, 2018] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2017_2018",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2017_2018",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
     if era in [2017, 2016] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_2016_2017", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2016_2017", "lnN", ch.SystMap()(lumi_2016_2017[era]))
 else:
-    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
+    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
     if era in [2017, 2018] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_LS",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BCC", "lnN", ch.SystMap()(lumi_13TeV_BCC[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_LS",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_BCC", "lnN", ch.SystMap()(lumi_13TeV_BCC[era]))
     if era in [2017, 2016] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_BBD", "lnN", ch.SystMap()(lumi_2016_2017[era]))
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_DB",  "lnN", ch.SystMap()(lumi_13TeV_DB[era]))
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "lumi_13TeV_GS",  "lnN", ch.SystMap()(lumi_13TeV_GS[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_BBD", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_DB",  "lnN", ch.SystMap()(lumi_13TeV_DB[era]))
+        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_GS",  "lnN", ch.SystMap()(lumi_13TeV_GS[era]))
 
 #######################################
 # FIXME: one of the syst is logUniform -- fix
@@ -349,23 +349,23 @@ if (analysis != "ttH") and (not isCR) and  HHtype=="multilepton":
         if "zzzz" in pr or "hzzhzz" in pr:
             zzzz_procs.append(pr)
     if len(wwww_procs) >0:
-        cb.cp().process(wwww_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["wwww"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["wwww"]) + " to processes: ", wwww_procs)
+        cb.cp().process(wwww_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["wwww"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["wwww"]) + " to processes: ", wwww_procs)
     if len(ttww_procs) >0:
-        cb.cp().process(ttww_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["ttww"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["ttww"]) + " to processes: ", ttww_procs)
+        cb.cp().process(ttww_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["ttww"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["ttww"]) + " to processes: ", ttww_procs)
     if len(tttt_procs) >0:
-        cb.cp().process(tttt_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["tttt"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["tttt"]) + " to processes: ", tttt_procs)
+        cb.cp().process(tttt_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["tttt"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["tttt"]) + " to processes: ", tttt_procs)
     if len(zzww_procs) >0:
-        cb.cp().process(zzww_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["zzww"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["zzww"]) + " to processes: ", zzww_procs)
+        cb.cp().process(zzww_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["zzww"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["zzww"]) + " to processes: ", zzww_procs)
     if len(ttzz_procs) >0:
-        cb.cp().process(ttzz_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["ttzz"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["ttzz"]) + " to processes: ", ttzz_procs)
+        cb.cp().process(ttzz_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["ttzz"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["ttzz"]) + " to processes: ", ttzz_procs)
     if len(zzzz_procs) >0:
-        cb.cp().process(zzzz_procs).AddSyst(cb,  "CMS_multilepton_qqHH_dipoleRecoil", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["zzzz"],1.)))
-        print ("added CMS_multilepton_qqHH_dipoleRecoil with value " + str(vbf_dipole_ln_Syst[channel]["zzzz"]) + " to processes: ", zzzz_procs)
+        cb.cp().process(zzzz_procs).AddSyst(cb,  "qqHH_pythiaDipoleOn", "lnN", ch.SystMap()((vbf_dipole_ln_Syst[channel]["zzzz"],1.)))
+        print ("added qqHH_pythiaDipoleOn with value " + str(vbf_dipole_ln_Syst[channel]["zzzz"]) + " to processes: ", zzzz_procs)
 ########################################
 # add rate parameters
 if withCR and analysis != "ttH" and HHtype=="multilepton":
