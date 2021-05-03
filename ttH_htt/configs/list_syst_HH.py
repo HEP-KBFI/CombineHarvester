@@ -3,15 +3,18 @@
 ### where era = 2016/2017/2018
 
 # syst: theory and from MC generators - taken correlated between all years (check if that is what we want to do)
-lumiSyst             = {2016: 1.022,          2017: 1.020,          2018: 1.015}
-lumi_2016_2017_2018  = {2016: 1.009,          2017: 1.008,          2018: 1.020}
-lumi_2017_2018       = {2017: 1.0042,         2018: 1.0028}
-lumi_2016_2017       = {2016: 1.0075,          2017: 1.0065}
+#lumiSyst             = {2016: 1.022,          2017: 1.020,          2018: 1.015}
+#lumi_2016_2017_2018  = {2016: 1.009,          2017: 1.008,          2018: 1.020}
+#lumi_2017_2018       = {2017: 1.0042,         2018: 1.0028}
+#lumi_2016_2017       = {2016: 1.0075,          2017: 1.0065}
 #lumi_2017_2018       = {2017: 1.003,          2018: 1.004}
 #lumi_2016_2017       = {2016: 1.008,          2017: 1.006}
 #lumi_13TeV_BCC       = {2017: 1.003,          2018: 1.002}
 #lumi_13TeV_DB        = {2016: 1.005,          2017: 1.005}
 #lumi_13TeV_GS        = {2016: 1.004,          2017: 1.001}
+lumiSyst             = {2016: 1.010,          2017: 1.020,          2018: 1.015}
+lumi_2016_2017_2018  = {2016: 1.006,          2017: 1.009,          2018: 1.020}
+lumi_2017_2018       = {2017: 1.006,          2018: 1.002}
 
 vbf_dipole_ln_Syst = {
     "0l_4tau" : {"wwww": 1.,   "ttww":1.94, "tttt":0.93, "zzww":1.,    "ttzz":1.,    "zzzz":1.},
@@ -269,8 +272,8 @@ def specific_syst(analysis, list_channel_opt, channel="multilepton") :
             "CMS_ttHl_UnclusteredEn"        : {"correlated" : False, "renameTo" : "CMS_unclusteredEnergy_Era",  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
             "CMS_ttHl_pileup"               : {"correlated" : False, "renameTo" : "CMS_pileup_Era",  "proc" : "MCproc"                 , "channels" : list(list_channel_opt.keys())},
             
-            "CMS_ttHl_PS_TT_ISR"   : {"correlated" : True, "renameTo" : "CMS_%s_PS_TT_ISR"%channel, "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
-            "CMS_ttHl_PS_TT_FSR"   : {"correlated" : True, "renameTo" : "CMS_%s_PS_TT_FSR"%channel, "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
+            "CMS_ttHl_PS_TT_ISR"   : {"correlated" : True, "renameTo" : "ps_isr", "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
+            "CMS_ttHl_PS_TT_FSR"   : {"correlated" : True, "renameTo" : "ps_fsr", "proc" : ["TT"], "channels" : ["3l", "WZCR", "1l_0tau", "2l_0tau"]},
             "CMS_ttHl_JESHEM"       : {"correlated" : True,  "renameTo" : "CMS_HEM_2018"  , "proc" : "MCproc"      , "channels" : list(set(list(list_channel_opt.keys())) - set(["3l", "1l_0tau", "2l_0tau"]))}, # only for 2018 -- that is set on the Writedatacards # Saswati: it is removed for bb1l as up histogram is absent
            # "CMS_ttHl_EWK_btag"     : {"correlated" : True, "renameTo" : "CMS_multilepton_EWK_btag"   , "proc" : ["WZ"], "channels" : list(set(list(list_channel_opt.keys())) - set(["0l_4tau"]))}, 
            # "CMS_ttHl_EWK_jet"      : {"correlated" : True, "renameTo" : "CMS_multilepton_EWK_jet"   , "proc" : ["WZ"], "channels" : [k for k,v in list_channel_opt.items() if "WZ" in v["bkg_procs_from_MC"] or "ZZ" in v["bkg_procs_from_MC"]]}, ## added only on SRs atm

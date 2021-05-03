@@ -275,8 +275,8 @@ if (analysis != "ttH"):
     cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2016_2017_2018", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
     if era in [2017, 2018] :
         cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2017_2018",  "lnN", ch.SystMap()(lumi_2017_2018[era]))
-    if era in [2017, 2016] :
-        cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2016_2017", "lnN", ch.SystMap()(lumi_2016_2017[era]))
+    #if era in [2017, 2016] :
+    #    cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_2016_2017", "lnN", ch.SystMap()(lumi_2016_2017[era]))
 else:
     cb.cp().process(bkg_procs_from_MC + higgs_procs_plain).AddSyst(cb, "CMS_lumi_13TeV_XY", "lnN", ch.SystMap()(lumi_2016_2017_2018[era]))
     if era in [2017, 2018] :
@@ -548,6 +548,8 @@ for specific_syst in specific_ln_systs :
         print ("Skipped ", specific_syst , " in ", channel)
         continue
     procs = list_proc(specific_ln_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+    if "QCDscale_ggHH" in specific_syst and signal_type == "nonresNLO":
+        procs = []
     if len(procs) == 0 :
         continue
     name_syst = specific_syst 
@@ -677,9 +679,10 @@ if shape :
                 if 'Clos' in MC_shape_syst_era_2 and analysis == "HH":
                     MC_shape_syst_era_2 = MC_shape_syst_era_2+ "_" + channel
                 if 'CMS_btag' in MC_shape_syst_era_2:
-                    if not ('stats' in MC_shape_syst_era_2 or 'cferr' in MC_shape_syst_era_2):                        
-                        if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2017_2018')
-                        if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2017_2018')
+                    if not ('stats' in MC_shape_syst_era_2):                        
+                        if '2016' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2016','2016_2017_2018')
+                        if '2017' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2017','2016_2017_2018')
+                        if '2018' in str(era): MC_shape_syst_era_2 = MC_shape_syst_era_2.replace('2018','2016_2017_2018')
             cb.cp().process(procs_for_shape).RenameSystematic(cb, MC_shape_syst_era, MC_shape_syst_era_2)
             print ("renamed " + MC_shape_syst_era + " as shape uncertainty to MC prcesses to " + MC_shape_syst_era_2)
         else :
