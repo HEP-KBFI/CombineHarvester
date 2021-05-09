@@ -584,7 +584,8 @@ def make_threshold(threshold, proc_list, file_input, tH_kin) :
             print ("there was no process %s in the prepareDatacard" % proc )
             add_proc = False
         else:
-            #print('make_threshold: {} {}'.format(proc, integral))
+            if integral < 0.:
+                print("make_threshold: {} has negative integral: {}".format(proc, integral))
             if tH_kin and ( "tHq" in proc or "tHW" in proc ):
                 if integral < threshold/10. :
                     print ("there was no sufficient yield of process %s (integral = %s)" % (proc, str(integral)) )
