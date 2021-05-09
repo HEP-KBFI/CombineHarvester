@@ -283,18 +283,19 @@ def rescale_stxs_pT_bins (inputShapesI, stxs_pT_bins, era) :
                 continue
             if not "_htt" in obj_name and not "_hww" in obj_name and not "_hzz" in obj_name and not "_hzg" in obj_name and not "_hmm" in obj_name :
                 continue
-            for key in stxs_pT_bins.keys() :
-                if key in obj_name :
-                    factor = stxs_pT_bins[key][era]
+            for stxs_key in stxs_pT_bins.keys() :
+                if stxs_key in obj_name :
+                    factor = stxs_pT_bins[stxs_key][era]
+                    break
             if factor == 1.0 :
                 print ("Something wrong, it is not scaling ", obj_name)
             nominal = obj.Clone()
             nominal.Scale( factor )
             nominal.Write()
-            print ("rescaled ", key, obj_name, factor, nominal.Integral(), obj.Integral())
+            print ("rescaled ", stxs_key, obj_name, factor, nominal.Integral(), obj.Integral())
     tfileout1.Close()
 
-def check_systematics (inputShapesL, coupling) :
+def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
     if coupling == "none" :
         print ("Not doing cards with couplings, skping to modify all shapes with 'kt' mark on it from tHq/tHW/HH")
     ## it assumes no subdirectories in the preparedatacards file,
@@ -307,6 +308,9 @@ def check_systematics (inputShapesL, coupling) :
         if (coupling == "none" or coupling == "kt_1_kv_1") and "_kt_" in obj_name :
             continue
         if not (coupling == "none" or coupling == "kt_1_kv_1") and ("tHq" in obj_name or "tHW" in obj_name) and not coupling in obj_name :
+            continue
+        if any(stxs_pT_bin in obj_name for stxs_pT_bin in stxs_pT_bins):
+            # do not touch distributions binned according to STXS
             continue
         ### FIXME: not doing BSM HH
         if "HH" in obj_name and "_kt_" in obj_name :
@@ -569,21 +573,28 @@ def get_tH_weight_str_out_clara(kt, kv, cosa = -10):
 
 def make_threshold(threshold, proc_list, file_input, tH_kin) :
     tfileout = ROOT.TFile(file_input, "READ")
+    proc_list_new = []
     for proc in proc_list :
         histo = tfileout.Get(proc)
-        try : integral = histo.Integral()
+        add_proc = True
+        integral = -1e3
+        try:
+            integral = histo.Integral()
         except :
             print ("there was no process %s in the prepareDatacard" % proc )
-            proc_list = list(set(list(proc_list)) - set([proc]))
-            continue
-        if tH_kin and ( "tHq" in proc or "tHW" in proc ):
-            if integral < threshold/10. :
+            add_proc = False
+        else:
+            #print('make_threshold: {} {}'.format(proc, integral))
+            if tH_kin and ( "tHq" in proc or "tHW" in proc ):
+                if integral < threshold/10. :
+                    print ("there was no sufficient yield of process %s (integral = %s)" % (proc, str(integral)) )
+                    add_proc = False
+            elif integral < threshold :
                 print ("there was no sufficient yield of process %s (integral = %s)" % (proc, str(integral)) )
-                proc_list = list(set(list(proc_list)) - set([proc]))
-        elif integral < threshold :
-            print ("there was no sufficient yield of process %s (integral = %s)" % (proc, str(integral)) )
-            proc_list = list(set(list(proc_list)) - set([proc]))
-    return proc_list
+                add_proc = False
+        if add_proc:
+            proc_list_new.append(proc)
+    return proc_list_new
 
 # usage: file, path = splitPath(s)
 def splitPath(s) :

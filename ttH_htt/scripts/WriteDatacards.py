@@ -95,8 +95,8 @@ else :
     print ("Analysis %s not implemented, should be \"ttH\" or \"HH\"")
     sys.exit()
 
-higgs_procs = list_channels( fake_mc, signal_type, mass, HHtype, renamedHHInput )["higgs_procs"]
-list_channel_opt   = list_channels( fake_mc, signal_type, mass, HHtype, renamedHHInput )["info_bkg_channel"]
+higgs_procs = list_channels( analysis, fake_mc )["higgs_procs"]
+list_channel_opt   = list_channels( analysis, fake_mc )["info_bkg_channel"]
 bkg_proc_from_data = list_channel_opt[channel]["bkg_proc_from_data"]
 bkg_procs_from_MC  = list_channel_opt[channel]["bkg_procs_from_MC"]
 
@@ -156,7 +156,7 @@ if removeProcs :
         print ("New list of Higgs processes", higgs_procs_plain)
         print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)])
 
-pT_bins = {}
+stxs_pT_bins = {}
 if stxs :
     # take ttH_ as the pT bins
     stxs_pT_bins            = {
@@ -189,16 +189,21 @@ if shape :
     if not path.exists(inputShapes) :
         print("inputShapes = ", inputShapes)
         shutil.copy2(inputShapesRaw, inputShapes)
-        #if stxs :
-        #    print ("\n copied \n %s to \n %s \nto rescale the pT bins with the cross sections by pT bins (see this git issue https://github.com/HEP-KBFI/tth-htt/issues/142)" % (inputShapesRaw, inputShapes))
-        #    rescale_stxs_pT_bins(inputShapes, stxs_pT_bins, era)
-        #else :
-        #    print ("\n copied \n %s to \n %s \nto make modifications in problematic bins." % (inputShapesRaw, inputShapes))
-        #    # FIXME: now if we do rescale_stxs_pT_bins somehow doing check_systematics makes the result without correct rescaling.
-        #    # I will not debug that now, the check_systematics is mostly to not deliver weird postfit shapes
-        #    # with bins with large uncertainties, it does not matter for numeric results.
-        #    check_systematics(inputShapes, coupling)
-        check_systematics(inputShapes, coupling)
+        if stxs :
+           print ("\n copied \n %s to \n %s \nto rescale the pT bins with the cross sections by pT bins (see this git issue https://github.com/HEP-KBFI/tth-htt/issues/142)" % (inputShapesRaw, inputShapes))
+           rescale_stxs_pT_bins(inputShapes, stxs_pT_bins, era)
+        else :
+           print ("\n copied \n %s to \n %s \nto make modifications in problematic bins." % (inputShapesRaw, inputShapes))
+           # FIXME: now if we do rescale_stxs_pT_bins somehow doing check_systematics makes the result without correct rescaling.
+           # I will not debug that now, the check_systematics is mostly to not deliver weird postfit shapes
+           # with bins with large uncertainties, it does not matter for numeric results.
+
+           # Karl: the reason why the rescaling changes the normalization of Higgs pT bin is because of very low statistics
+           #       in some of the bins, so much so that in some bins the event counts are negative. These negative weights
+           #       are replaced with a very small positive value (1e-5) that's actually large enough to alter the integral
+           #       significantly. Temporary solution for now is to disable the modification of Higgs pT bins for now.
+           #check_systematics(inputShapes, coupling) # we rescale the distributions regardless of doing STXS or not
+        check_systematics(inputShapes, coupling, stxs_pT_bins)
     else :
         print ("file %s already modified" % inputShapes)
 else :
@@ -208,10 +213,10 @@ else :
 print ("do not add a process to datacard if the yield is smaller than 0.01 -- if so, do not add it")
 bkg_proc_from_data = make_threshold(0.01, bkg_proc_from_data,  inputShapes, tH_kin)
 bkg_procs_from_MC  = make_threshold(0.01, bkg_procs_from_MC, inputShapes, tH_kin)
-if analysis == "HH" and signal_type == "nonresLO":
-    ## FIXME: to the ggHH and qqHH processes in NLO cards do not discard any component by threshold
-    # by now it is not discarting any H process, narrow that down to ggHH and qqHH processes
-    higgs_procs_plain  = make_threshold(0.01, higgs_procs_plain, inputShapes, tH_kin)
+#if analysis == "HH" and signal_type == "nonresLO":
+#    ## FIXME: to the ggHH and qqHH processes in NLO cards do not discard any component by threshold
+#    # by now it is not discarting any H process, narrow that down to ggHH and qqHH processes
+higgs_procs_plain  = make_threshold(0.01, higgs_procs_plain, inputShapes, tH_kin)
 
 print ("final list of signal/bkg to add to datacards")
 MC_proc = higgs_procs_plain + bkg_procs_from_MC
@@ -282,12 +287,12 @@ for specific_syst in theory_ln_Syst :
     if len(procs) == 0 :
         continue
     if "HH" in procs[0] :
-        for decay in list_channels( fake_mc, signal_type, mass, HHtype, renamedHHInput )["decays_hh"] :
+        for decay in list_channels( analysis, fake_mc )["decays_hh"] :
             procs = procs + [procs[0] + decay]
     elif "H" in procs[0] and analysis == "ttH":
         if tH_kin and ("tHq" in procs[0] or "tHW" in procs[0]) :
             continue
-        for decay in list_channels( fake_mc, signal_type, mass, HHtype, renamedHHInput )["decays"] :
+        for decay in list_channels( analysis, fake_mc )["decays"] :
             procs = procs + [procs[0] + decay]
     else :
         if procs[0] not in bkg_procs_from_MC :
