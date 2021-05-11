@@ -195,9 +195,9 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
 
     finalFile = outpuShape.replace(".root", "_all.root")
     print ("File merged with fake/gen syst: ", finalFile)
-    head, tail = os.path.split(inputShapes)
-    print ('doing hadd in directory: ' + head)
-    p = Popen(shlex.split("hadd -f %s %s %s" % (finalFile, outpuShape, inputShapes)) , stdout=PIPE, stderr=PIPE, cwd=head)
+    hadd_str = "hadd -f %s %s %s" % (finalFile, outpuShape, inputShapes)
+    print ('doing hadd : ' + hadd_str)
+    p = Popen(shlex.split(hadd_str) , stdout=PIPE, stderr=PIPE)
     comboutput = p.communicate()[0]
     #if "conversions" in MC_proc : MC_proc.remove("conversions")
     ## fixme: old cards does not have uniform naming convention to tH/VH
