@@ -95,10 +95,11 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
             histUp = ROOT.TH1F()
             histDo = ROOT.TH1F()
             ## fixme: old cards does not have uniform naming convention to tH/VH -- it should be only continue to conversions
+            # do not write Convs -- otherwise it's doubled for 2lss+1tau and 3l+1tau
             if "Convs" in proc :
-                try : hist = tfile.Get(histFind)
-                except : print ("Doesn't find" + histFind)
-                hist.Write()
+                # try : hist = tfile.Get(histFind)
+                # except : print ("Doesn't find" + histFind)
+                # hist.Write()
                 continue
             #if  proc or "conversions" in proc or proc in ["tHq", "tHW", "VH"]: continue
             print ("================================================")
@@ -152,11 +153,12 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
                 #if not specific_shape_shape_systs[shape_to_shape]["correlated"] :
                 #    name_syst = name_syst.replace("%sl" % analysis, "%sl%s" % (analysis, str(era - 2000)))
                 for proc in MC_proc :
+                    # do not write Convs -- otherwise it's doubled for 2lss+1tau and 3l+1tau
                     if "Convs" in proc :
-                        histFindCentral = "%s" % (proc)
-                        try : histCentral = tfile.Get(histFindCentral)
-                        except : print ("Doesn't find" + histFindCentral)
-                        histCentral.Write()
+                        # histFindCentral = "%s" % (proc)
+                        # try : histCentral = tfile.Get(histFindCentral)
+                        # except : print ("Doesn't find" + histFindCentral)
+                        # histCentral.Write()
                         continue
                     histFindCentral = "%s_%s" % (proc, typeHist)
                     try : histCentral = tfile.Get(histFindCentral)
