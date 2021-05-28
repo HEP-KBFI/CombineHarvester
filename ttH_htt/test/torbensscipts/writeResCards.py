@@ -15,6 +15,9 @@ parser.add_option("--spinCase", type="string", dest="spinCase", help="The spin c
 parser.add_option("--channel", type="string", dest="channel", help="The multilepton channel, either 0l_4tau, 1l_3tau, 2lss, 2l_2tau, 3l, 3l_1tau, 4l")
 parser.add_option("--era", type="string", dest="era", help="The data taking period.")
 parser.add_option("--withCR", action='store_true',dest="withCR", default=False)
+parser.add_option("--binByBin", action='store_true',dest="binByBin", default=False)
+parser.add_option("--removeLowYieldShapes", action='store_true',dest="removeLowYieldShapes", default=False)
+parser.add_option("--removeLowImpactShapes", action='store_true',dest="removeLowImpactShapes", default=False)
 (options, args) = parser.parse_args()
 
 inputPath = options.inputPath
@@ -23,6 +26,9 @@ spinCase = options.spinCase
 channel = options.channel
 era = options.era
 withCR = options.withCR
+binByBin = options.binByBin
+removeLowYieldShapes = options.removeLowYieldShapes
+removeLowImpactShapes = options.removeLowImpactShapes
 listproc = glob.glob( "%s/*.root" % inputPath)
 commands = []
 for card in listproc:
@@ -33,6 +39,9 @@ for card in listproc:
         outputfile = 'datacard_' + channel + '_' + era + '_' + spinCase + "_" + mass
         command1 = 'WriteDatacards.py  --inputShapes %s --channel %s --HHtype "multilepton" --analysis HH --noX_prefix --era %s --signal_type "res" --renamedHHInput --shapeSyst  --forceModifyShapes --mass %s --output_file %s/%s' %(card,channel, era, (spinCase + "_" + mass),outPath, outputfile)
         if withCR: command1 = command1 + ' --withCR'
+        if binByBin: command1 = command1 + ' --binByBin'
+        if removeLowYieldShapes: command1 = command1 + ' --removeLowYieldShapes'
+        if removeLowImpactShapes: command1 = command1 + ' --removeLowImpactShapes'
         command2= 'rm %s*mod*'%(inputPath)
         commands.append(command1)
         commands.append(command2)

@@ -1,6 +1,6 @@
 def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", renamedHHInput=False ) :
     #####################
-    # signal_type = "noresLO" | "nonresNLO" | "res"
+    # signal_type = "noresLO" | "nonresNLO" | "res" | "forC2" | "forC2_alt1" 
     # mass nonres = "cHHH1" | cHHH... || "SM", "BM12", "kl_1p00"... || "spin0_900",....
     # HHtype = "bbWW" | "multilepton"
     #####################
@@ -51,6 +51,71 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
     SM_VBF     = "1_1_1"
     prefix_GF  = "signal_ggf_nonresonant"
     couplings_GF_NLO = [ "cHHH0", "cHHH1", "cHHH5", "cHHH2p45" ]
+    couplings_GF_C2 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                        "kl_5p00_kt_1p00_c2_0p00", "kl_0p00_kt_1p00_c2_0p00","kl_0p00_kt_1p00_c2_1p00",
+                        "kl_1p00_kt_1p00_c2_3p00","kl_1p00_kt_1p00_c2_0p35",
+#"kl_1p00_kt_1p00_c2_0p10",
+#"kl_1p00_kt_1p00_c2_m2p00",
+#"kl_2p45_kt_1p00_c2_0p00"
+]
+    couplings_GF_C2_alt1 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             "kl_5p00_kt_1p00_c2_0p00", "kl_0p00_kt_1p00_c2_0p00","kl_0p00_kt_1p00_c2_1p00",
+                             #"kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             #"kl_1p00_kt_1p00_c2_0p10",
+                             "kl_1p00_kt_1p00_c2_m2p00",
+                             #"kl_2p45_kt_1p00_c2_0p00"
+                         ]
+    couplings_GF_C2_alt2 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             "kl_5p00_kt_1p00_c2_0p00", 
+                             #"kl_0p00_kt_1p00_c2_0p00",
+                             "kl_0p00_kt_1p00_c2_1p00",
+                             #"kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             #"kl_1p00_kt_1p00_c2_0p10",
+                             "kl_1p00_kt_1p00_c2_m2p00",
+                             "kl_2p45_kt_1p00_c2_0p00"
+                         ]
+    couplings_GF_C2_alt3 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             "kl_5p00_kt_1p00_c2_0p00", 
+                             #"kl_0p00_kt_1p00_c2_0p00",
+                             "kl_0p00_kt_1p00_c2_1p00",
+                             "kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             #"kl_1p00_kt_1p00_c2_0p10",
+                             #"kl_1p00_kt_1p00_c2_m2p00",
+                             "kl_2p45_kt_1p00_c2_0p00"
+                         ]
+    couplings_GF_C2_alt4 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             #"kl_5p00_kt_1p00_c2_0p00", 
+                             "kl_0p00_kt_1p00_c2_0p00",
+                             "kl_0p00_kt_1p00_c2_1p00",
+                             #"kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             #"kl_1p00_kt_1p00_c2_0p10",
+                             "kl_1p00_kt_1p00_c2_m2p00",
+                             "kl_2p45_kt_1p00_c2_0p00"
+                         ]
+    couplings_GF_C2_alt5 = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             #"kl_5p00_kt_1p00_c2_0p00", 
+                             "kl_0p00_kt_1p00_c2_0p00",
+                             "kl_0p00_kt_1p00_c2_1p00",
+                             "kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             #"kl_1p00_kt_1p00_c2_0p10",
+                             #"kl_1p00_kt_1p00_c2_m2p00",
+                             "kl_2p45_kt_1p00_c2_0p00"
+                         ]
+    couplings_GF_C2_all = [ "kl_1p00_kt_1p00_c2_0p00", 
+                             "kl_5p00_kt_1p00_c2_0p00", 
+                             "kl_0p00_kt_1p00_c2_0p00",
+                             "kl_0p00_kt_1p00_c2_1p00",
+                             "kl_1p00_kt_1p00_c2_3p00",
+                             "kl_1p00_kt_1p00_c2_0p35",
+                             "kl_1p00_kt_1p00_c2_0p10",
+                             "kl_1p00_kt_1p00_c2_m2p00",
+                             "kl_2p45_kt_1p00_c2_0p00"
+                         ]
     couplings_VBF    = [ "1_1_1", "1_1_2", "1_2_1", "1_1_0", "1p5_1_1", "0p5_1_1", "1_0_1" ]
     if renamedHHInput :
         prefix_VBF = "qqHH"
@@ -82,6 +147,54 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
         listSig = []
         for decay_hh in decays_hh :
             listSig = listSig + [ "signal_ggf_%s_%s" % (mass, decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_alt1":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_alt1 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_alt2":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_alt2 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_alt3":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_alt3 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_alt4":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_alt4 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_alt5":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_alt5 :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif signal_type == "forC2_all":
+        listSig = []
+        for decay_hh in decays_hh :
+            for scenario in couplings_GF_C2_all :
+                listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
+        sigs = [ listSig ]
+    elif 'forC2_ded' in signal_type:
+        listSig = []
+        scenario = signal_type[signal_type.find('ded_')+4:]
+        for decay_hh in decays_hh :
+            listSig = listSig + [ "%s_%s_%s" % (prefix_GF, scenario , decay_hh) ]
         sigs = [ listSig ]
     else :
         print("signal_type %s not implemented" % (signal_type))

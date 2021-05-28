@@ -34,7 +34,7 @@ parser.add_option("--HH_kin",         action="store_true", dest="HH_kin",      h
 parser.add_option("--stxs",           action="store_true", dest="stxs",        help="Cards for stxs", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
-parser.add_option("--signal_type",    type="string",       dest="signal_type", help="Options: \"nonresLO\" | \"nonresNLO\" | \"res\" ", default="none")
+parser.add_option("--signal_type",    type="string",       dest="signal_type", help="Options: \"nonresLO\" | \"nonresNLO\" | \"res\"  | \"forC2\"", default="none")
 parser.add_option("--mass",           type="string",       dest="mass",        help="Options: \n nonresNLO = it will be ignored \n noresLO = \"SM\", \"BM12\", \"kl_1p00\"... \n \"spin0_900\", ...", default="none")
 parser.add_option("--HHtype",         type="string",       dest="HHtype",      help="Options: \"bbWW\" | \"multilepton\" | \"bbWW_bbtt\" ", default="none")
 parser.add_option("--renamedHHInput", action="store_true", dest="renamedHHInput",   help="If used input already renamed.", default=True)
@@ -224,7 +224,8 @@ else :
     inputShapes = inputShapesRaw
 
 if analysis!="ttH":
-    higgs_procs_plain = filterSig(inputShapes,higgs_procs_plain, 0.001)
+    higgs_procs_plain = filterSig(inputShapes,higgs_procs_plain, 0.00005)
+    
 
 
 # check a threshold on processes
@@ -548,7 +549,7 @@ for specific_syst in specific_ln_systs :
         print ("Skipped ", specific_syst , " in ", channel)
         continue
     procs = list_proc(specific_ln_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
-    if "QCDscale_ggHH" in specific_syst and signal_type == "nonresNLO":
+    if "QCDscale_ggHH" in specific_syst and (signal_type == "nonresNLO" or signal_type == "forC2"):
         procs = []
     if len(procs) == 0 :
         continue

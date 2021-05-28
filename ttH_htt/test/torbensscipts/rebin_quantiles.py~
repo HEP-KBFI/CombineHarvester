@@ -7,22 +7,25 @@ import ROOT
 import math
 from collections import OrderedDict
 import numpy as np
+# python test/rename_procs.py --inputPath /home/acaan/hhAnalysis/2016/hh_bb1l_23Jul_baseline_TTSL/datacards/hh_bb1l/prepareDatacards/ --card prepareDatacards_hh_bb1l_hh_bb1l_cat_jet_2BDT_Wjj_BDT_SM_HbbFat_WjjFat_HP_e.root
+"""
+<ggHHsamplename>_<whatever>_Hbb_HZZ
+<ggHHsamplename>_<whatever>_Hbb_Htt
+"""
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--inputPath", type="string", dest="inputPath", help="Full path of where prepareDatacards.root are ")
 parser.add_option("--card",      type="string", dest="card",      help="name of prepareDatacards.root. In not given will pick all from the inputPath", default="none")
 parser.add_option("--threshold",      type="float", dest="threshold",      help="relativ bin error threshold", default=0.3)
 parser.add_option("--quantSig", action='store_true',dest="quantSig", default=False)
-parser.add_option("--binPath",      type="string", dest="binPath",      help="Path where to extract binning from", default=None)
-parser.add_option("--sepFake", action='store_true',dest="sepFake", default=False)
+parser.add_option("--is4l", action='store_true',dest="is4l", default=False)
 (options, args) = parser.parse_args()
 
 inputPath = options.inputPath
 card      = options.card
 threshold = options.threshold
 quantSig = options.quantSig
-binPath = options.binPath
-sepFake = options.sepFake
+is4l = options.is4l
 def checkIfLabeledHistogram(hist):
     areAllLabelled = True
     nofBins = hist.GetNbinsX() + 1
@@ -42,17 +45,8 @@ def compIntegral(hist, und, ov):
         content = content + hist.GetBinContent(i)
     return content
 
-def getBinningFromFile(inputFile):
-    tfilein = ROOT.TFile(inputFile, "READ")
-    data_fakes = tfilein.Get("ggZZ")
-    x = []
-    for i in range(data_fakes.GetNbinsX()):
-        x.append(data_fakes.GetBinLowEdge(i+1))
-    x.append(1.)
-    tfilein.Close()
-    return np.array(x)
-
 def makeBinContentsPositive(hist):
+    #print "Correcting possible negative bins in:" + hist.GetName()
     integral_original = max(0.,compIntegral(hist,False, False))
     isLabelled = checkIfLabeledHistogram(hist)
     initBin = 0
@@ -88,54 +82,47 @@ def getQuantiles(inputShapesL):
     tfilein = ROOT.TFile(inputShapesL, "READ")
     bgs = ROOT.TH1F()
     sig = ROOT.TH1F()
-    prompt = ROOT.TH1F()
-    nonprompt = ROOT.TH1F()
     x_final = np.array([0.])
     bestscore = 0
     nb = 0
     ns = 0
-    nprompt = 0
-    nnonprompt =0
     for nkey, key in enumerate(tfilein.GetListOfKeys()) :
         name = key.GetName()
-        if not ('signal' in name or 'ggHH' in name or 'qqHH' in name or 'CMS' in name or 'fakes_mc' in name or 'data_obs' in name or 'flips_mc' in name):
+        if not ('signal' in name or 'CMS' in name or 'fakes_mc' in name or 'data_obs' in name):
+            #print name
             obj = key.ReadObj()
             #obj.Sumw2()
             if nb is 0:
                 bgs = obj.Clone()
             else:
                 bgs.Add(obj)
-            if 'data_fakes' in name or 'data_flips' in name:
-                if nnonprompt is 0:
-                    nonprompt = obj.Clone()
-                else: 
-                    nonprompt.Add(obj)
-                nnonprompt = nnonprompt +1
-            else:
-                if nprompt is 0:
-                    prompt = obj.Clone()
-                else: 
-                    prompt.Add(obj)
-                nprompt = nprompt +1
             nb = nb + 1
-        if (('signal' in name or 'ggHH' in name or 'qqHH' in name) and 'CMS' not in name):
+        if ('signal' in name and 'CMS' not in name):
+            #print name
             obj = key.ReadObj()
             if ns is 0:
                 sig = obj.Clone()
             else:
                 sig.Add(obj)
             ns = ns + 1
-    print "tessssst", prompt.Integral()
-    print "tessssst", nonprompt.Integral()
     possible_quantiles=[]
     possible_quantiles_errors=[]
+    #print bgs.Integral()
     for i in range(30):
-        nq = 30-i
+        #if quantileFound: continue
+        nq=30-i
         if nq < 5: continue
         bgs_test=bgs.Clone()
         sig_test=sig.Clone()
-        prompt_test = prompt.Clone()
-        nonprompt_test = nonprompt.Clone()
+        bgs_test_mod=bgs.Clone()
+        sig_test_mod=sig.Clone()
+        if is4l:
+            for i in range(1,bgs_test_mod.GetNbinsX()+1):
+                if bgs_test_mod.GetBinLowEdge(i)>0.9:
+                    bgs_test_mod.SetBinContent(i,0)
+                    bgs_test_mod.SetBinError(i,0)
+                    sig_test_mod.SetBinContent(i,0)
+                    sig_test_mod.SetBinError(i,0)
         y = []
         x = []
         for j in range(nq):
@@ -145,46 +132,57 @@ def getQuantiles(inputShapesL):
         x = np.array(x)
         quant = None
         if quantSig:
-            quant= sig_test.GetQuantiles(nq,x,y)
+            quant= sig_test_mod.GetQuantiles(nq,x,y)
         else:
-            quant= bgs_test.GetQuantiles(nq,x,y)
+            quant= bgs_test_mod.GetQuantiles(nq,x,y)
         x = np.append(x,np.array([1.]))
+        #binstomask = np.ones(len(x), dtype=bool)
+        # for en in range(len(x)-1):
+        #     if (bgs_test.FindBin(x[en]) is bgs_test.FindBin(x[en+1])):
+        #         binstomask[en +1] =False
+        # print binstomask
+        # x = x[binstomask]
+        #print nq, x, len(x)
+        #print "-------"
+        #print bgs_test.Integral()
         low_bins = []
         for en in range(len(x)-1):
             low_bins.append(bgs_test.FindBin(x[en]))
-        #if nq < 10:
-        #    for b in low_bins[:]:
-        #        if low_bins.count(b)>1: low_bins.append(b+1)
+        if nq < 10:
+            for b in low_bins[:]:
+                if low_bins.count(b)>1: low_bins.append(b+1)
         low_bins = sorted(list(set(low_bins)))
         better_x = []
         for b in low_bins:
             better_x.append(bgs_test.GetBinLowEdge(b))
         better_x[0] = 0.
         better_x=np.array(better_x)
-        x = np.append(better_x,np.array([1.]))
+        x = None
+        if is4l:
+            x = np.append(better_x,np.array([0.9,1.]))
+        else:
+            x = np.append(better_x,np.array([1.]))
         quantileOk= True
         bgs_test= bgs_test.Rebin(len(x)-1,bgs_test.GetName() ,x)
         sig_test= sig_test.Rebin(len(x)-1,sig_test.GetName() ,x)
-        prompt_test = prompt_test.Rebin(len(x)-1,prompt_test.GetName() ,x)
-        nonprompt_test = nonprompt_test.Rebin(len(x)-1,nonprompt_test.GetName() ,x)
+        #print bgs_test.Integral()
+        #print "-------"
         temp_binerrors = []
         for j in range(bgs_test.GetNbinsX()):
+            #print bgs_test.GetBinError(j)/bgs_test.GetBinContent(j), bgs_test.GetBinContent(j), bgs_test.GetBinError(j)
+            #print  nq, bgs_test.GetBinContent(j+1)
+            #print sig_test.GetBinContent(j+1)
             if(bgs_test.GetBinContent(j+1)>0):
-                if not sepFake:
-                    quantileOk = quantileOk and bgs_test.GetBinError(j+1)/bgs_test.GetBinContent(j+1)<threshold
-                else:
-                    if(prompt_test.GetBinContent(j+1)>0):
-                        quantileOk = quantileOk and prompt_test.GetBinError(j+1)/prompt_test.GetBinContent(j+1)<threshold
-                    if(nonprompt_test.GetBinContent(j+1)>0):
-                        quantileOk = quantileOk and nonprompt_test.GetBinError(j+1)/nonprompt_test.GetBinContent(j+1)<0.5
-                    elif(nonprompt_test.Integral()/bgs_test.Integral() > 0.2):quantileOk = False
+                quantileOk = quantileOk and bgs_test.GetBinError(j+1)/bgs_test.GetBinContent(j+1)<threshold
                 temp_binerrors.append(bgs_test.GetBinError(j+1)/bgs_test.GetBinContent(j+1))
-                #print bgs_test.GetBinError(j+1)/bgs_test.GetBinContent(j+1), bgs_test.GetBinContent(j+1)
             else:
                 quantileOk = False
         if quantileOk or len(x)<=6:
             possible_quantiles.append(x)
             possible_quantiles_errors.append(temp_binerrors)
+            #print nq, y, len(y), x, len(x)
+            #x_final = x
+            #quantileFound = True
         del bgs_test, x,y
     binerrors_final =[]
     for b, binning in enumerate(possible_quantiles):
@@ -192,11 +190,15 @@ def getQuantiles(inputShapesL):
         sig_test=sig.Clone()
         bgs_test= bgs_test.Rebin(len(binning)-1,bgs_test.GetName() ,binning)
         sig_test= sig_test.Rebin(len(binning)-1,sig_test.GetName() ,binning)
-        score = len(binning)
-        #score = 0
-        #for j in range(bgs_test.GetNbinsX()):
-        #    if (bgs_test.GetBinContent(j+1)>0): score = score + sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1)
-        #score = math.sqrt(score)
+        score = 0
+        for j in range(bgs_test.GetNbinsX()):
+            #score = score + sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1)*(bgs_test.GetBinError(j+1)*bgs_test.GetBinError(j+1)/(bgs_test.GetBinContent(j+1)*bgs_test.GetBinContent(j+1)))
+            #print binning
+            if (bgs_test.GetBinContent(j+1)>0): score = score + sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1)
+            #score = score + math.sqrt(sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1))
+            #if math.sqrt(sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1))>score:
+            #    score = math.sqrt(sig_test.GetBinContent(j+1)*sig_test.GetBinContent(j+1)/bgs_test.GetBinContent(j+1))
+        score = math.sqrt(score)
         if score > bestscore:
             bestscore = score
             x_final = binning
@@ -206,12 +208,14 @@ def getQuantiles(inputShapesL):
     return x_final
 
 def rebin (inputShapesL, inputShapesLnew, bins) :
+    ## it assumes no subdirectories in the preparedatacards file,
     tfilein1 = ROOT.TFile(inputShapesL, "READ")
     tfileout2 = ROOT.TFile(inputShapesLnew, "RECREATE")
     tfilein1.cd()
     for nkey, key in enumerate(tfilein1.GetListOfKeys()) :
         obj =  key.ReadObj()
         obj_name = key.GetName()
+        #if type(obj) is not ROOT.TH1F and type(obj) is not ROOT.TH1D and type(obj) is not ROOT.TH1 and type(obj) is not ROOT.TH1S and type(obj) is not ROOT.TH1C and type(obj) is not ROOT.TH1 :
         if type(obj) is not ROOT.TH1F :
             if type(obj) is ROOT.TH1 :
                 print ("data_obs can be be TH1")
@@ -223,11 +227,6 @@ def rebin (inputShapesL, inputShapesLnew, bins) :
         nominal  = ROOT.TH1F()
         nominal = obj.Rebin(len(bins)-1,obj.GetName() , bins)
         if not ('data_obs' in key.GetName()):  nominal = makeBinContentsPositive(nominal)
-        nEmpty = 0
-        if not ('data_obs' in key.GetName() or 'CMS' in key.GetName()): 
-            for b in range(nominal.GetNbinsX()):
-                if nominal.GetBinContent(b+1) <=0.: nEmpty = nEmpty + 1
-            if nEmpty > 0: print "WARNING empty bins found for ", key.GetName(), " Integral: ", nominal.Integral(), "nbins: ", nominal.GetNbinsX(), " empty bins:", nEmpty 
         nominal.Write()
         tfilein1.cd()
     tfilein1.Close()
@@ -249,12 +248,7 @@ else :
 for prepareDatacard in listproc :
     prepareDatacardNew = prepareDatacard.replace(inputPath, inputPathNew)
     if ('MVAOutput' in str(prepareDatacardNew)):
-        bins=None
-        if binPath:
-            bincard = prepareDatacard.replace(inputPath,binPath)
-            bins = getBinningFromFile(bincard)
-        else:
-            bins = getQuantiles(prepareDatacard)
+        bins = getQuantiles(prepareDatacard)
         print bins, len(bins)
         rebin(prepareDatacard,prepareDatacardNew, bins)
     print ("done", prepareDatacardNew)

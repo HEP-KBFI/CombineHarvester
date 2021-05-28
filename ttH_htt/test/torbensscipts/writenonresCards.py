@@ -15,6 +15,9 @@ parser.add_option("--channel", type="string", dest="channel", help="The multilep
 parser.add_option("--era", type="string", dest="era", help="The data taking period.")
 parser.add_option("--sigtype", type="string", dest="sigtype", help="The signaltype either nonresLO or nonresNLO")
 parser.add_option("--withCR", action='store_true',dest="withCR", default=False)
+parser.add_option("--binByBin", action='store_true',dest="binByBin", default=False)
+parser.add_option("--removeLowYieldShapes", action='store_true',dest="removeLowYieldShapes", default=False)
+parser.add_option("--removeLowImpactShapes", action='store_true',dest="removeLowImpactShapes", default=False)
 (options, args) = parser.parse_args()
 
 inputPath = options.inputPath
@@ -23,17 +26,25 @@ channel = options.channel
 era = options.era
 sigtype = options.sigtype
 withCR = options.withCR
-bmcases = ["SM","BM1","BM2","BM3","BM4","BM5","BM6","BM7","BM8","BM9","BM10","BM11","BM12"]
+binByBin = options.binByBin
+removeLowYieldShapes = options.removeLowYieldShapes
+removeLowImpactShapes = options.removeLowImpactShapes
+bmcases = ["SM","JHEP04BM1","JHEP04BM2","JHEP04BM3","JHEP04BM4","JHEP04BM5","JHEP04BM6","JHEP04BM7","JHEP04BM8","JHEP04BM9","JHEP04BM10","JHEP04BM11","JHEP04BM12","JHEP04BM8a","JHEP03BM1","JHEP03BM2","JHEP03BM3","JHEP03BM4","JHEP03BM5","JHEP03BM6","JHEP03BM7","extrabox"]
+if "NLO" in sigtype:
+    bmcases = ["SM","JHEP04BM1","JHEP04BM2","JHEP04BM3","JHEP04BM4","JHEP04BM5","JHEP04BM6","JHEP04BM7","JHEP04BM8","JHEP04BM9","JHEP04BM10","JHEP04BM11","JHEP04BM12"]
 listproc = glob.glob( "%s/*.root" % inputPath)
 commands = []
 for card in listproc:
     for BMCase in bmcases:
-        if (BMCase + '.') in card and channel in card:
+        if ('MVAOutput_' + BMCase + '.') in card and channel in card:
             cardname = card.split("/")[-1]
             inPath = card.strip(cardname)
             outputfile = 'datacard_' + channel + '_' + era + '_' + BMCase
             command1 = 'WriteDatacards.py  --inputShapes %s --channel %s --HHtype "multilepton" --analysis HH --noX_prefix --era %s --signal_type %s --renamedHHInput --shapeSyst  --forceModifyShapes --output_file %s/%s' %(card,channel, era, sigtype, outPath, outputfile)
             if withCR: command1 = command1 + ' --withCR'
+            if binByBin: command1 = command1 + ' --binByBin'
+            if removeLowYieldShapes: command1 = command1 + ' --removeLowYieldShapes'
+            if removeLowImpactShapes: command1 = command1 + ' --removeLowImpactShapes'
             command2= 'rm %s*mod*'%(inputPath)
             commands.append(command1)
             commands.append(command2)

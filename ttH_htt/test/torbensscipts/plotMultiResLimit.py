@@ -18,6 +18,7 @@ parser.add_option("--scanlabels", type="string", dest="scanlabels", help="scan l
 parser.add_option("--log", action='store_true',dest="logy", default=False)
 parser.add_option("--min", type="float", dest="miny", help="min y", default = 0.0)
 parser.add_option("--max", type="float", dest="maxy", help="max y", default = 0.0)
+parser.add_option("--unblind", action='store_true',dest="unblind", default=False)
 (options, args) = parser.parse_args()
 inputPaths = options.inputPaths
 scanlabels = options.scanlabels
@@ -27,6 +28,7 @@ ylabel = options.ylabel
 logy = options.logy
 miny = options.miny
 maxy = options.maxy
+unblind = options.unblind
 def getLimits(file_name): 
     file = ROOT.TFile(file_name)
     tree = file.Get("limit")
@@ -38,8 +40,12 @@ def getLimits(file_name):
 def plotUpperLimits(resultdicts, scanlabels, xlabel, ylabel,outpath):
     # see CMS plot guidelines: https://ghm.web.cern.ch/ghm/plots/
     tgraphs = []
+    tgraphs_observed = []
     up2s = [ ]
     colors =  [ROOT.kBlack,ROOT.kBlue,ROOT.kRed,41,ROOT.kGray+1,ROOT.kMagenta+2,ROOT.kOrange+7,ROOT.kCyan+2]
+    markers = [20,21,22,23,24,25,26,32]
+    if len(resultdicts)==2:
+        markers=[23,24]
     for k,r in enumerate(resultdicts):
         values = []
         for key in r.keys():
@@ -47,13 +53,19 @@ def plotUpperLimits(resultdicts, scanlabels, xlabel, ylabel,outpath):
         N = len(values)
         values = sorted(values)
         median = ROOT.TGraph(N)      # median line
+        observed = ROOT.TGraph(N)      # observed line
         i = 0
         for v in values:
             limit = r[str(v)]
+            if unblind and len(limit)<6:
+                raise Exception("Not enougth entries in limit to unblind")
             up2s.append(limit[2])
+            if unblind:
+                observed.SetPoint(    i,    values[i], limit[5] ) # observed
             median.SetPoint(    i,    values[i], limit[2] ) # median
             i = i + 1
         tgraphs.append(median)
+        if unblind: tgraphs_observed.append(observed)
     W = 800
     H  = 600
     T = 0.08*H
@@ -82,7 +94,7 @@ def plotUpperLimits(resultdicts, scanlabels, xlabel, ylabel,outpath):
     frame.GetYaxis().SetTitleOffset(0.9)
     frame.GetXaxis().SetNdivisions(508)
     frame.GetYaxis().CenterTitle(True)
-    frame.GetYaxis().SetTitle("95% upper limit on #sigma (#Chi#rightarrow hh) [pb]")
+    frame.GetYaxis().SetTitle("95% upper limit on #sigma (#Chi#rightarrow HH) [pb]")
     frame.GetXaxis().SetTitle(xlabel)
     frame.SetMinimum(miny)
     frame.SetMaximum(max(up2s)*1.05)
@@ -95,24 +107,50 @@ def plotUpperLimits(resultdicts, scanlabels, xlabel, ylabel,outpath):
     tgraphs[0].Draw()
     for i, g in enumerate(tgraphs):
         g.SetLineColor(colors[i])
+        print scanlabels.split(":")[i], markers[i]
+        g.SetMarkerColor(colors[i])
+        g.SetMarkerStyle(markers[i])
+        g.SetMarkerSize(1.2)
+        if not unblind:
+            g.SetLineWidth(2)
+            g.Draw("PLSame")
+        else:
+            g.SetLineStyle(2)
+            g.SetLineWidth(1)
+            g.Draw("LSame")
+    for i, g in enumerate(tgraphs_observed):
+        g.SetLineColor(colors[i])
+        print scanlabels.split(":")[i], markers[i]
+        g.SetMarkerColor(colors[i])
+        g.SetMarkerStyle(markers[i])
+        g.SetMarkerSize(1.2)
         g.SetLineWidth(2)
-        g.Draw("Same")
+        g.Draw("PLSame")
+        
     CMS_lumi.lumi_sqrtS = ylabel
     CMS_lumi.CMS_lumi(c,0,11)
     ROOT.gPad.SetTicks(1,1)
     frame.Draw('sameaxis')
  
-    x1 = 0.7
-    x2 = x1 + 0.24
-    y2 = 0.86
-    y1 = 0.60
+    #x1 = 0.459
+    x1 = 0.3
+    x2 = 0.959
+    y2 = 0.9175
+    y1 = 0.6675
     legend = ROOT.TLegend(x1,y1,x2,y2)
-    legend.SetFillStyle(0)
+    #legend.SetFillStyle(0)
+    #legend.SetFillColor(1)
+    legend.SetNColumns(3)
     legend.SetBorderSize(0)
     legend.SetTextSize(0.041)
     legend.SetTextFont(42)
-    for i,g in enumerate(tgraphs):
-        legend.AddEntry(g, scanlabels.split(":")[i],'L')
+    if unblind:
+        for i,g in enumerate(tgraphs_observed):
+            legend.AddEntry(g, scanlabels.split(":")[i],'PL')
+        legend.AddEntry(tgraphs[0], 'expected','L')
+    else:
+        for i,g in enumerate(tgraphs):
+            legend.AddEntry(g, scanlabels.split(":")[i],'PL')
     legend.Draw()
     print " "
     c.SaveAs(outpath)

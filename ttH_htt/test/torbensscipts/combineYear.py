@@ -21,7 +21,7 @@ ZZPath = options.ZZPath
 path16 = inputPath + "2016/"
 path17 = inputPath + "2017/"
 path18 = inputPath + "2018/"
-pathRun2 = inputPath + "RUN2/"
+pathRun2 = inputPath + "Run2/"
 
 
 commands = []
@@ -42,7 +42,7 @@ for card in listproc:
     combineCommand = 'combineCards.py HH_%s_2016=%s HH_%s_2017=%s HH_%s_2018=%s'%(channel, card16, channel,card17, channel,card18)
     if WZPath: combineCommand = combineCommand  + 'HH_WZCR_2016=%s HH_WZCR_2017=%s HH_WZCR_2018=%s'%(WZPath.replace('ERA','2016'), WZPath.replace('ERA','2017'), WZPath.replace('ERA','2018'))
     if ZZPath: combineCommand = combineCommand  + 'HH_ZZCR_2016=%s HH_ZZCR_2017=%s HH_ZZCR_2018=%s'%(ZZPath.replace('ERA','2016'), ZZPath.replace('ERA','2017'), ZZPath.replace('ERA','2018'))
-    combineCommand = combineCommand  + ' >> %s'%(cardRun2)
+    combineCommand = combineCommand  + ' > %s'%(cardRun2)
     commands.append(combineCommand)
     commands.append("sed -i 's|%s||g' %s"%(path16, cardRun2))
     commands.append("sed -i 's|%s||g' %s"%(path17, cardRun2))

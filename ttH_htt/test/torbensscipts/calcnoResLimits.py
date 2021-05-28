@@ -13,39 +13,51 @@ parser.add_option("--inputPath", type="string", dest="inputPath", help="Full pat
 parser.add_option("--outPath", type="string", dest="outPath", help="Full path of where the cards should be created ")
 parser.add_option("--channel", type="string", dest="channel", help="The multilepton channel, either 0l_4tau, 1l_3tau, 2lss, 2l_2tau, 3l, 3l_1tau, 4l")
 parser.add_option("--era", type="string", dest="era", help="The data taking period.")
+parser.add_option("--unblind", action='store_true', dest="unblind", help="Weather to unblind or not.", default=False)
 (options, args) = parser.parse_args()
 
 inputPath = options.inputPath
 outPath = options.outPath
 channel = options.channel
 era = options.era
+unblind = options.unblind
 
 listproc = glob.glob( "%s/*.txt" % inputPath)
 combinecommands = []
 cleancommands =[] 
-bmcases = ["SM","BM1","BM2","BM3","BM4","BM5","BM6","BM7","BM8","BM9","BM10","BM11","BM12"]
+bmcases = ["SM","JHEP04BM1","JHEP04BM2","JHEP04BM3","JHEP04BM4","JHEP04BM5","JHEP04BM6","JHEP04BM7","JHEP04BM8","JHEP04BM9","JHEP04BM10","JHEP04BM11","JHEP04BM12","JHEP04BM8a","JHEP03BM1","JHEP03BM2","JHEP03BM3","JHEP03BM4","JHEP03BM5","JHEP03BM6","JHEP03BM7","extrabox"]
 for card in listproc:
     for BMCase in bmcases:
         if (BMCase + '.') in card:
             cardname = card.split("/")[-1]
             label = "multilepton_%s_%s_%s_%s" %(era, channel, "nonresLO", BMCase)
-            command1 = "combine -M Asymptotic -m 125 -n %s %s --run blind"% (label,card)
-            command2 = "mv higgsCombine%s.Asymptotic.mH125.root %s"%(label, outPath)
+            command1 = "combine -M AsymptoticLimits -m 125 -n %s %s --run blind --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --rMin -5"% (label,card)
+            if unblind:
+                command1 = "combine -M AsymptoticLimits -m 125 -n %s %s --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 --rMin -5"% (label,card)              
+            command2 = "mv higgsCombine%s.AsymptoticLimits.mH125.root %s"%(label, outPath)
             combinecommands.append(command1)
             cleancommands.append(command2)
 
-reorderedCombineCommands = [combinecommands[i:i + 4] for i in range(0, len(combinecommands), 4)]
-for combineBlock in reorderedCombineCommands:
-    commands = []
-    for command in combineBlock:
-        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        commands.append([command,p])
-    for command in commands:
-        print command[0]
-        for line in command[1].stdout.readlines():
-            print line.rstrip("\n")
-        command[1].wait()
-        print 'done'
+# reorderedCombineCommands = [combinecommands[i:i + 4] for i in range(0, len(combinecommands), 4)]
+# for combineBlock in reorderedCombineCommands:
+#     commands = []
+#     for command in combineBlock:
+#         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#         commands.append([command,p])
+#     for command in commands:
+#         print command[0]
+#         for line in command[1].stdout.readlines():
+#             print line.rstrip("\n")
+#         command[1].wait()
+#         print 'done'
+for command in combinecommands:
+    print command
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+        print line.rstrip("\n")
+    print 'done'
+    retval = p.wait()
+
 for command in cleancommands:
     print command
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

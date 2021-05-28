@@ -14,6 +14,7 @@ parser = OptionParser()
 parser.add_option("--inputPath", type="string", dest="inputPath", help="Full path to the datacard")
 parser.add_option("--outPath", type="string", dest="outPath", help="Full path of where the GOF results and plot should be saved ")
 parser.add_option("--analysis", type="string", dest="analysis", help="The scenario name e.g. nonResLO_SM")
+parser.add_option("--desc", type="string", dest="desc", help="The scenario description e.g. nonResLO_SM")
 parser.add_option("--channel", type="string", dest="channel", help="The multilepton channel, either 0l_4tau, 1l_3tau, 2lss, 2l_2tau, 3l, 3l_1tau, 4l")
 parser.add_option("--era", type="string", dest="era", help="The data taking period.")
 parser.add_option("--ntoys", type="int", dest="ntoys", help="Number of toys to be generated")
@@ -26,6 +27,7 @@ outPath = options.outPath
 analysis = options.analysis
 channel = options.channel
 era = options.era
+desc = options.desc
 ntoys = options.ntoys
 skipCombine=options.skipCombine
 minx=options.minx
@@ -40,7 +42,7 @@ tdrstyle.setTDRStyle()
 commands = []
 commands.append("combine -M GoodnessOfFit --algo=saturated %s -n _%s_%s_%s_data -m 125"%(inputPath, channel, era, analysis))
 commands.append("mv higgsCombine_%s_%s_%s_data.GoodnessOfFit.mH125.root %s"%(channel, era, analysis, outPath))
-commands.append("combine -M GoodnessOfFit --algo=saturated %s -n _%s_%s_%s_toys -m 125 -t %s --toysFreq"%(inputPath, channel, era, analysis, ntoys))
+commands.append("combine -M GoodnessOfFit --algo=saturated %s -n _%s_%s_%s_toys -m 125 -t %s --toysFreq -v 1"%(inputPath, channel, era, analysis, ntoys))
 commands.append("mv higgsCombine_%s_%s_%s_toys.GoodnessOfFit.mH125.123456.root %s"%(channel, era, analysis, outPath))
 
 if not skipCombine:
@@ -95,10 +97,11 @@ line.SetLineColor(ROOT.kRed)
 line.SetLineWidth(3)
 line.Draw("same")
 line.SetLineColor(ROOT.kRed)
-CMS_lumi.lumi_sqrtS = "hh-multilepton %s %s (%s)"%(channel, era, analysis)
+if not desc: CMS_lumi.lumi_sqrtS = "hh-multilepton %s %s (%s)"%(channel, era, analysis)
+else: CMS_lumi.lumi_sqrtS = "%s"%(desc)
 CMS_lumi.CMS_lumi(c,0,11)
 ROOT.gPad.SetTicks(1,1)
-pvalue=toys.Integral(toys.FindBin(mean), -1)
+pvalue=round(toys.Integral(toys.FindBin(mean), -1),4)
 x1 = 0.7
 x2 = 0.9
 y2 = 0.85

@@ -7,7 +7,11 @@ import ROOT
 import math
 from collections import OrderedDict
 import numpy as np
-
+# python test/rename_procs.py --inputPath /home/acaan/hhAnalysis/2016/hh_bb1l_23Jul_baseline_TTSL/datacards/hh_bb1l/prepareDatacards/ --card prepareDatacards_hh_bb1l_hh_bb1l_cat_jet_2BDT_Wjj_BDT_SM_HbbFat_WjjFat_HP_e.root
+"""
+<ggHHsamplename>_<whatever>_Hbb_HZZ
+<ggHHsamplename>_<whatever>_Hbb_Htt
+"""
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--inputPath", type="string", dest="inputPath", help="Full path of where prepareDatacards.root are ")
@@ -15,7 +19,6 @@ parser.add_option("--card",      type="string", dest="card",      help="name of 
 parser.add_option("--threshold",      type="float", dest="threshold",      help="relativ bin error threshold", default=0.3)
 parser.add_option("--maxX",      type="float", dest="maxX",      help="Maximum x axis range", default=0.)
 parser.add_option("--quantSig", action='store_true',dest="quantSig", default=False)
-parser.add_option("--binPath",      type="string", dest="binPath",      help="Path where to extract binning from", default=None)
 (options, args) = parser.parse_args()
 
 inputPath = options.inputPath
@@ -23,17 +26,6 @@ card      = options.card
 threshold = options.threshold
 quantSig = options.quantSig
 maxX      = options.maxX
-binPath = options.binPath
-def getBinningFromFile(inputFile):
-    tfilein = ROOT.TFile(inputFile, "READ")
-    data_fakes = tfilein.Get("data_fakes")
-    x = []
-    for i in range(data_fakes.GetNbinsX()):
-        x.append(data_fakes.GetBinLowEdge(i+1))
-    x.append(maxX)
-    tfilein.Close()
-    return np.array(x)
-
 
 def checkIfLabeledHistogram(hist):
     areAllLabelled = True
@@ -55,6 +47,7 @@ def compIntegral(hist, und, ov):
     return content
 
 def makeBinContentsPositive(hist):
+    #print "Correcting possible negative bins in:" + hist.GetName()
     integral_original = max(0.,compIntegral(hist,False, False))
     isLabelled = checkIfLabeledHistogram(hist)
     initBin = 0
@@ -75,11 +68,10 @@ def makeBinContentsPositive(hist):
             hist.SetBinError(i,math.sqrt(binError2_modified))
     integral_modified = max(0.,compIntegral(hist, False, False))
     if integral_original > 0. and integral_modified > 0.:
-        if not (integral_original==integral_modified):
-            sf = integral_original / integral_modified
-            for i in range(initBin, endBin):
-                binContent = hist.GetBinContent(i)
-                hist.SetBinContent(i, sf*binContent)
+        sf = integral_original / integral_modified
+        for i in range(initBin, endBin):
+            binContent = hist.GetBinContent(i)
+            hist.SetBinContent(i, sf*binContent)
     elif ('dats_obs' not in hist.GetName()):
         for i in range(initBin, endBin):
             hist.SetBinContent(i, 0.001/((endBin - 1) - initBin))
@@ -96,7 +88,7 @@ def getQuantiles(inputShapesL):
     ns = 0
     for nkey, key in enumerate(tfilein.GetListOfKeys()) :
         name = key.GetName()
-        if not ('signal' in name or 'CMS' in name or 'fakes_mc' in name or 'data_obs' in name or 'flips_mc' in name):
+        if not ('signal' in name or 'CMS' in name or 'fakes_mc' in name or 'data_obs' in name):
             print name
             obj = key.ReadObj()
             #obj.Sumw2()
@@ -145,7 +137,7 @@ def getQuantiles(inputShapesL):
         for tor in toremove:
             low_bins.remove(tor)
     x_final = np.array(low_bins)
-    bgs_test = bgs.Clone()
+    bgs_test=bgs.Clone()
     bgs_test= bgs_test.Rebin(len(x_final)-1,bgs_test.GetName() ,x_final)
     for j in range(bgs_test.GetNbinsX()):
         print bgs_test.GetBinContent(j+1)>0 , (bgs_test.GetBinError(j+1)/bgs_test.GetBinContent(j+1)<threshold)
@@ -153,6 +145,7 @@ def getQuantiles(inputShapesL):
     return x_final
 
 def rebin (inputShapesL, inputShapesLnew, bins) :
+    ## it assumes no subdirectories in the preparedatacards file,
     tfilein1 = ROOT.TFile(inputShapesL, "READ")
     tfileout2 = ROOT.TFile(inputShapesLnew, "RECREATE")
     print inputShapesLnew
@@ -162,6 +155,7 @@ def rebin (inputShapesL, inputShapesLnew, bins) :
             continue
         obj =  key.ReadObj()
         obj_name = key.GetName()
+        #if type(obj) is not ROOT.TH1F and type(obj) is not ROOT.TH1D and type(obj) is not ROOT.TH1 and type(obj) is not ROOT.TH1S and type(obj) is not ROOT.TH1C and type(obj) is not ROOT.TH1 :
         if type(obj) is not ROOT.TH1F :
             if type(obj) is ROOT.TH1 :
                 print ("data_obs can be be TH1")
@@ -174,16 +168,7 @@ def rebin (inputShapesL, inputShapesLnew, bins) :
         nominal_temp  = obj.Rebin(len(bins)-1,obj.GetName() , bins)
         while nominal_temp.GetNbinsX()>20:
             nominal_temp = nominal_temp.Rebin(2, nominal_temp.GetName())
-        nominal = None
-        if not ('data_obs' in key.GetName()):
-            nominal= makeBinContentsPositive(nominal_temp)
-        else:
-            nominal = nominal_temp
-        nEmpty=0
-        if not ('data_obs' in key.GetName() or 'CMS' in key.GetName()): 
-            for b in range(nominal.GetNbinsX()):
-                if nominal.GetBinContent(b+1) <=0.: nEmpty = nEmpty + 1
-            if nEmpty > 0: print "WARNING empty bins found for ", key.GetName(), " Integral: ", nominal.Integral(), "nbins: ", nominal.GetNbinsX(), " empty bins:", nEmpty 
+        nominal = makeBinContentsPositive(nominal_temp)
         nominal.Write()
         tfilein1.cd()
     tfilein1.Close()
@@ -204,12 +189,7 @@ else :
 
 for prepareDatacard in listproc :
     prepareDatacardNew = prepareDatacard.replace(inputPath, inputPathNew)
-    bins=None
-    if binPath:
-        bincard = prepareDatacard.replace(inputPath,binPath)
-        bins = getBinningFromFile(bincard)
-    else:
-        bins = getQuantiles(prepareDatacard)
+    bins = getQuantiles(prepareDatacard)
     print bins, len(bins)
     rebin(prepareDatacard,prepareDatacardNew, bins)
     print ("done", prepareDatacardNew)
