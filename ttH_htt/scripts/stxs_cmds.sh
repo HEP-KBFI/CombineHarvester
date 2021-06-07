@@ -51,9 +51,8 @@ basetopdir=$PWD/cards
 mkdir -p $basetopdir
 tar -C $basetopdir -I lz4 -xvf /hdfs/local/karl/archives/HIG-19-008/ttHAnalysis_stxs_2020Jun18.tar.lz4
 
-if [ ! -f ./compare_histograms.py ]; then
-  wget https://raw.githubusercontent.com/HEP-KBFI/tth-htt/dcard_production/scripts/compare_histograms.py
-fi
+rm -f ./compare_histograms.py;
+wget https://raw.githubusercontent.com/HEP-KBFI/tth-htt/dcard_production/scripts/compare_histograms.py
 
 hig_dcards=$HOME/hig-19-008
 if [ ! -d $hig_dcards ]; then
