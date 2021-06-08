@@ -1,0 +1,24 @@
+.DEFAULT_GOAL := all
+SHELL := /bin/bash
+
+all: combine_300_bkg mv1_bkg_300 mv2_bkg_300 combine_800_bkg mv1_bkg_800 mv2_bkg_800
+
+combine_300_bkg: 
+	combineTool.py -M FitDiagnostics /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic/combine_bkg_300_spin0_WS.root --saveShapes --saveWithUncertainties --saveNormalization --skipBOnlyFit --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 -n _shapes_combine_300_bkg
+	
+mv1_bkg_300:combine_300_bkg 
+	mv higgsCombine_shapes_combine_300_bkg.FitDiagnostics.mH120.root /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic
+	
+mv2_bkg_300:combine_300_bkg 
+	mv fitDiagnostics_shapes_combine_300_bkg.root /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic
+	
+combine_800_bkg: 
+	combineTool.py -M FitDiagnostics /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic/combine_bkg_800_spin0_WS.root --saveShapes --saveWithUncertainties --saveNormalization --skipBOnlyFit --saveOverallShapes --cminDefaultMinimizerType Minuit2 --cminDefaultMinimizerStrategy 0 --cminFallbackAlgo Minuit2,0:1.0 -n _shapes_combine_800_bkg
+	
+mv1_bkg_800:combine_800_bkg 
+	mv higgsCombine_shapes_combine_800_bkg.FitDiagnostics.mH120.root /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic
+	
+mv2_bkg_800:combine_800_bkg 
+	mv fitDiagnostics_shapes_combine_800_bkg.root /home/snandan/CMSSW_8_1_0/src/CombineHarvester/ttH_htt/datacard/Run2/res/spin0/fitdiagnostic
+	
+
