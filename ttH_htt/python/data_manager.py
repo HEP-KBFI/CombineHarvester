@@ -370,14 +370,22 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
                 #    print ("======> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
                 if nominal.GetBinContent(binn) > 0 :
                     ## if up or do is zero fixe it
-                    if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn) > 0) :
+                    # if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
+                    #     # both up- and down-fluctuations are zero while the nominal is not
+                    #     histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
+                    #     histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
+                    #     did_something_do = 1
+                    #     did_something_up = 1
+                    if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn)) > 0 :
+                        # down-fluctuation zero while nominal and up are not
                         histo_do.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)  )
                         # down = nominal / (up/nominal)
                         did_something_do = 1
                     if histo_up.GetBinContent(binn) == 0 and abs(histo_do.GetBinContent(binn)) > 0 :
+                        # up-fluctuation zero while nominal and down are not
                         histo_up.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_do.GetBinContent(binn)  )
-                        did_something_up = 1
                         # up = nominal/(down/nominal)
+                        did_something_up = 1
                     ##### then, deflate if too big
                     # if up/nom > 10: up = 10*nom
                     # if down/nom > 10: down = 10*nom
@@ -407,7 +415,7 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
                     did_something_nom = 1
                     did_something_do = 1
                     did_something_up = 1
-                if "FRjt_shape" in name_up and "data_fakes" in name_up:
+                if "data_fakes" in name_up:
                     print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
             if did_something_nom == 1 or did_something_up == 1 or did_something_do == 1 :
                 print ("modified syst templates in ", name_syst, " in process: ", name_nominal, " nom/up/do = ", did_something_nom,  did_something_up, did_something_do)
