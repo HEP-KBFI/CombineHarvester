@@ -156,26 +156,48 @@ if removeProcs :
         print ("New list of Higgs processes", higgs_procs_plain)
         print ("Removed", list_channel_opt[channel]["proc_to_remove"][str(era)])
 
-stxs_pT_bins = {}
+stxs_pT_bins = {
+    "ggH" : [
+        "ggH_GG2H_0J_PTH_0_10", "ggH_GG2H_0J_PTH_GT10", "ggH_GG2H_1J_PTH_0_60", "ggH_GG2H_1J_PTH_120_200", "ggH_GG2H_1J_PTH_60_120",
+          "ggH_GG2H_FWDH", "ggH_GG2H_GE2J_MJJ_0_350_PTH_0_60", "ggH_GG2H_GE2J_MJJ_0_350_PTH_120_200", "ggH_GG2H_GE2J_MJJ_0_350_PTH_60_120",
+          "ggH_GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25", "ggH_GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25",
+          "ggH_GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25", "ggH_GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25", "ggH_GG2H_PTH_200_300",
+          "ggH_GG2H_PTH_300_450", "ggH_GG2H_PTH_450_650", "ggH_GG2H_PTH_GT650",
+    ],
+    "qqH" : [
+        "qqH_QQ2HQQ_0J", "qqH_QQ2HQQ_1J", "qqH_QQ2HQQ_FWDH", "qqH_QQ2HQQ_GE2J_MJJ_0_60", "qqH_QQ2HQQ_GE2J_MJJ_120_350",
+          "qqH_QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25", "qqH_QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25",
+          "qqH_QQ2HQQ_GE2J_MJJ_60_120", "qqH_QQ2HQQ_GE2J_MJJ_GT350_PTH_GT200", "qqH_QQ2HQQ_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25",
+          "qqH_QQ2HQQ_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25",
+    ],
+    "WH" : [
+        "WH_FWDH", "WH_PTV_0_75", "WH_PTV_150_250_0J", "WH_PTV_150_250_GE1J", "WH_PTV_75_150", "WH_PTV_GT250", "WH_had_0J", "WH_had_1J",
+          "WH_had_FWDH", "WH_had_GE2J_MJJ_0_60", "WH_had_GE2J_MJJ_120_350", "WH_had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25",
+          "WH_had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25", "WH_had_GE2J_MJJ_60_120", "WH_had_GE2J_MJJ_GT350_PTH_GT200",
+          "WH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25", "WH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25",
+    ],
+    "ZH" : [
+        "ZH_FWDH", "ZH_PTV_0_75", "ZH_PTV_150_250_0J", "ZH_PTV_150_250_GE1J", "ZH_PTV_75_150", "ZH_PTV_GT250", "ZH_had_0J",
+          "ZH_had_1J", "ZH_had_FWDH", "ZH_had_GE2J_MJJ_0_60", "ZH_had_GE2J_MJJ_120_350", "ZH_had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25",
+          "ZH_had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25", "ZH_had_GE2J_MJJ_60_120", "ZH_had_GE2J_MJJ_GT350_PTH_GT200",
+          "ZH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25", "ZH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25",
+    ],
+    "ttH" : [ "ttH_PTH_0_60", "ttH_PTH_120_200", "ttH_PTH_200_300", "ttH_PTH_450_infty", "ttH_PTH_60_120", "ttH_PTH_fwd", ],
+}
 if stxs :
     # take ttH_ as the pT bins
-    stxs_pT_bins            = {
-        # pT bin           XS (now the cards are done normalizing ttH in each pT bin is normalized to 1pb)
-        "PTH_fwd"       : {2016 : 0.002646, 2017 : 0.002486, 2018 : 0.002732},
-        "PTH_0_60"      : {2016 : 0.048411, 2017 : 0.047804, 2018 : 0.047128},
-        "PTH_60_120"    : {2016 : 0.074606, 2017 : 0.074574, 2018 : 0.073956},
-        "PTH_120_200"   : {2016 : 0.053548, 2017 : 0.053988, 2018 : 0.054276},
-        "PTH_200_300"   : {2016 : 0.022305, 2017 : 0.022525, 2018 : 0.022999},
-        "PTH_300_infty" : {2016 : 0.010284, 2017 : 0.010420, 2018 : 0.010711},
-        #"PTH_300_450"   : {2016 : 0.008042, 2017 : 0.008178, 2018 : 0.008397},
-        #"PTH_300_infty" : {2016 : 0.002241, 2017 : 0.002242, 2018 : 0.002314},
-    }
+    proc_to_remove = []
+    proc_to_add = []
     for xproc in higgs_procs_plain :
-      if "ttH_" in xproc :
-        # remove the ttH_br of the list and add the same in a list of pT bins
-        higgs_procs_plain        = list(set(higgs_procs_plain) - set([xproc]))
-        for pTs in list(stxs_pT_bins.keys()) :
-          higgs_procs_plain   = higgs_procs_plain + [ xproc.replace("ttH", "ttH_" + pTs) ]
+      for stxs_key in stxs_pT_bins:
+        if xproc.startswith(stxs_key):
+          # remove the ttH_br of the list and add the same in a list of pT bins
+          proc_to_remove.append(proc_to_remove)
+          for pTs in stxs_pT_bins[stxs_key]:
+              proc_to_add.append(xproc.replace(stxs_key, pTs))
+    for proc in proc_to_remove:
+        higgs_procs_plain.remove(proc)
+    higgs_procs_plain.extend(proc_to_add)
     print ("higgs_procs == ", higgs_procs_plain)
 
 if shape :
@@ -189,11 +211,12 @@ if shape :
     if not path.exists(inputShapes) :
         print("inputShapes = ", inputShapes)
         shutil.copy2(inputShapesRaw, inputShapes)
-        if stxs :
-           print ("\n copied \n %s to \n %s \nto rescale the pT bins with the cross sections by pT bins (see this git issue https://github.com/HEP-KBFI/tth-htt/issues/142)" % (inputShapesRaw, inputShapes))
-           rescale_stxs_pT_bins(inputShapes, stxs_pT_bins, era)
-        else :
-           print ("\n copied \n %s to \n %s \nto make modifications in problematic bins." % (inputShapesRaw, inputShapes))
+        # Karl: once again, disable rescaling -> we already have rescaled the processes
+        # if stxs :
+        #    print ("\n copied \n %s to \n %s \nto rescale the pT bins with the cross sections by pT bins (see this git issue https://github.com/HEP-KBFI/tth-htt/issues/142)" % (inputShapesRaw, inputShapes))
+        #    rescale_stxs_pT_bins(inputShapes, stxs_pT_bins, era)
+        # else :
+        #    print ("\n copied \n %s to \n %s \nto make modifications in problematic bins." % (inputShapesRaw, inputShapes))
            # FIXME: now if we do rescale_stxs_pT_bins somehow doing check_systematics makes the result without correct rescaling.
            # I will not debug that now, the check_systematics is mostly to not deliver weird postfit shapes
            # with bins with large uncertainties, it does not matter for numeric results.

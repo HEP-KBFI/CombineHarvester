@@ -311,7 +311,7 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
             continue
         if not (coupling == "none" or coupling == "kt_1_kv_1") and ("tHq" in obj_name or "tHW" in obj_name) and not coupling in obj_name :
             continue
-        if any(stxs_pT_bin in obj_name for stxs_pT_bin in stxs_pT_bins):
+        if any(stxs_pT_val in obj_name for stxs_pT_bin in stxs_pT_bins for stxs_pT_val in stxs_pT_bins[stxs_pT_bin]):
             # do not touch distributions binned according to STXS
             continue
         ### FIXME: not doing BSM HH
