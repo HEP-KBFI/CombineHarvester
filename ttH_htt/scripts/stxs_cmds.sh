@@ -1,5 +1,12 @@
 #!/bin/bash
 
+era=$1
+
+if [[ "$era" != "2016" ]] && [[ "$era" != "2017" ]] && [[ "$era" != "2018" ]]; then
+  echo "Invalid era: $era";
+  exit 1;
+fi
+
 declare -A hadd_map
 hadd_map["0l_2tau"]="Tight_OS/hadd/hadd_stage2_Tight_OS.root"
 hadd_map["1l_1tau"]="Tight_disabled/hadd/hadd_stage2_Tight_disabled.root"
@@ -67,69 +74,72 @@ if [ ! -d $rescaled_cards ]; then
   exit 1
 fi
 
-for era in 2016 2017 2018; do
+topdir=$basetopdir/$era
+mkdir -p $topdir
 
-  topdir=$basetopdir/$era
-  mkdir -p $topdir
+for channel in 0l_2tau 1l_1tau 1l_2tau 2l_2tau 2lss_1tau 2los_1tau 3l_1tau; do
 
-  for channel in 0l_2tau 1l_1tau 1l_2tau 2l_2tau 2lss_1tau 2los_1tau 3l_1tau; do
-    
-    resultsdir=$topdir/2020Jun18/datacards/$channel/results
-    mkdir -p $resultsdir
+  resultsdir=$topdir/2020Jun18/datacards/$channel/results
+  mkdir -p $resultsdir
 
-    logdir=$topdir/2020Jun18/logs/$channel
-    mkdir -p $logdir
-    
-    subchannels=$channel
-    if [ $channel = "2lss_1tau" ]; then
-      subchannels="${channel}_rest ${channel}_tH ${channel}_ttH"
+  logdir=$topdir/2020Jun18/logs/$channel
+  mkdir -p $logdir
+
+  subchannels=$channel
+  if [ $channel = "2lss_1tau" ]; then
+    subchannels="${channel}_rest ${channel}_tH ${channel}_ttH"
+  fi
+  echo "Subchannels are: $subchannels";
+
+  for subchannel in $subchannels; do
+
+    merge_htxs_output_base=stxs_${subchannel}_${outputvar_map[$channel]}
+    merge_htxs_output=$topdir/2020Jun18/datacards/$channel/stxs/${merge_htxs_output_base}.root
+    rescaled_htxs=$rescaled_cards/$era/hadd_stage1_rescaled_${subchannel}_stxsMerged.root
+    input_orig=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}.root
+    input_noTTH=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}_noTTH.root
+    final_results_root=$resultsdir/ttH_${subchannel}_${era}.root
+    final_results_txt=$resultsdir/ttH_${subchannel}_${era}.txt
+
+    if [ ! -f $input_orig ]; then
+      echo "No such file: $input_orig"
+      exit 1
     fi
-    echo "Subchannels are: $subchannels";
-    
-    for subchannel in $subchannels; do
-    
-      merge_htxs_output_base=stxs_${subchannel}_${outputvar_map[$channel]}
-      merge_htxs_output=$topdir/2020Jun18/datacards/$channel/stxs/${merge_htxs_output_base}.root
-      rescaled_htxs=$rescaled_cards/$era/hadd_stage1_rescaled_${subchannel}_stxsMerged.root
-      input_orig=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}.root
-      input_noTTH=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}_noTTH.root
+    if [ ! -f $rescaled_htxs ]; then
+      echo "No such file: $rescaled_htxs"
+      exit 1
+    fi
 
-      if [ ! -f $input_orig ]; then
-        echo "No such file: $input_orig"
-        exit 1
-      fi
-      if [ ! -f $rescaled_htxs ]; then
-        echo "No such file: $rescaled_htxs"
-        exit 1
-      fi
+    # remove ttH histograms from the original STXS cards since they're extracted and rescaled in the 2nd input
+    remove_stxs.py $input_orig $input_noTTH
 
-      # remove ttH histograms from the original STXS cards since they're extracted and rescaled in the 2nd input
-      remove_stxs.py $input_orig $input_noTTH
+    # make sure that there are no common histograms between the two files we're about to hadd
+    nof_lines=$(./compare_histograms.py -i $input_noTTH -j $rescaled_htxs 2>&1 1>/dev/null | grep "Nothing to compare$" | wc -l)
+    if [ "$nof_lines" -ne 1 ]; then
+      echo "Found common histograms between $input_noTTH and $rescaled_htxs"
+      exit 1
+    fi
+    hadd $merge_htxs_output $input_noTTH $rescaled_htxs;
 
-      # make sure that there are no common histograms between the two files we're about to hadd
-      nof_lines=$(./compare_histograms.py -i $input_noTTH -j $rescaled_htxs 2>&1 1>/dev/null | grep "Nothing to compare$" | wc -l)
-      if [ "$nof_lines" -ne 1 ]; then
-        echo "Found common histograms between $input_noTTH and $rescaled_htxs"
-        exit 1
-      fi
-      hadd $merge_htxs_output $input_noTTH $rescaled_htxs;
+    merge_htxs_output_mod_root=$resultsdir/${merge_htxs_output_base}_mod.root
+    merge_htxs_output_mod_txt=$resultsdir/${merge_htxs_output_base}_mod.txt
 
-      merge_htxs_output_mod=$resultsdir/${merge_htxs_output_base}_mod.root
+    set -x
+    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs \
+      --inputShapes $merge_htxs_output --channel $subchannel \
+      --cardFolder $resultsdir \
+      --noX_prefix --forceModifyShapes &> $logdir/out_$subchannel.log
+    set +x
 
-      set -x
-      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs \
-        --inputShapes $merge_htxs_output --channel $subchannel \
-        --cardFolder $resultsdir \
-        --noX_prefix --forceModifyShapes &> $logdir/out_$subchannel.log
-      set +x
+    datacard=$hig_dcards/ttH_${subchannel}_${era}.root
+    diff_txt=$topdir/diff_${era}_${subchannel}.txt
 
-      datacard=$hig_dcards/ttH_${subchannel}_${era}.root
-      diff_txt=$topdir/diff_${era}_${subchannel}.txt
-      
-      ./compare_histograms.py -i $merge_htxs_output_mod -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
-      echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
-    
-    done
+    mv -v $merge_htxs_output_mod_root $final_results_root
+    mv -v $merge_htxs_output_mod_txt  $final_results_txt
+
+    ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
+    echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
 
   done
+
 done

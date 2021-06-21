@@ -14,7 +14,7 @@ ifptr = ROOT.TFile.Open(ifn, 'read')
 ikeys = [ k.GetName() for k in ifptr.GetListOfKeys() ]
 hists = []
 for k in ikeys:
-  if k.startswith('ttH'):
+  if k.startswith('ttH_PTH'):
     continue
   hist = ifptr.Get(k)
   hist.SetDirectory(0)
