@@ -502,8 +502,8 @@ if shape :
         #    continue
         if ( "HEM" in specific_syst ) and era != 2018 :
             print ("skkiping ", specific_syst, "as it is not era 2018")
-        if "HEM" in specific_syst and stxs :
-            continue
+        #if "HEM" in specific_syst and stxs :
+        #    continue
         if specific_shape_systs[specific_syst]["correlated"] and specific_shape_systs[specific_syst]["renameTo"] == None :
             continue
         #################
