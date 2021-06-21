@@ -182,7 +182,9 @@ def specific_syst(analysis, list_channel_opt) :
             "CMS_ttHl_FRm_shape_eta_barrel" : {"correlated" : True, "renameTo" : "CMS_ttHl_FRm_be"  , "proc" : ["data_fakes"], "channels" : [n for n in list(list_channel_opt.keys()) if "4l" in n or "3l" in n or "2l" in n or "1l" in n ]},
             "CMS_ttHl_FRjt_norm"            : {"correlated" : False, "renameTo" : None              , "proc" : ["data_fakes"], "channels" : [k for k,v in list_channel_opt.items() if  ("2tau" in k or "1tau" in k) and not v["isSMCSplit"]]},
             "CMS_ttHl_FRjt_shape"           : {"correlated" : False, "renameTo" : None              , "proc" : ["data_fakes"], "channels" : [k for k,v in list_channel_opt.items() if  ("2tau" in k or "1tau" in k) and not v["isSMCSplit"]]},
-            "CMS_ttHl_FRet_shift"           : {"correlated" : False, "renameTo" : None              , "proc" : ["data_fakes"], "channels" : [k for k,v in list_channel_opt.items() if  ("2tau" in k or "1tau" in k) and not v["isSMCSplit"]]},
+            #TODO consider removing the following two
+            "CMS_ttHl_FRet_shift"           : {"correlated" : False, "renameTo" : None              , "proc" : "MCproc", "channels" : [k for k,v in list_channel_opt.items() if  ("2tau" in k or "1tau" in k) and v["isSMCSplit"]]},
+            "CMS_ttHl_FRmt_shift"           : {"correlated" : False, "renameTo" : None              , "proc" : "MCproc", "channels" : [k for k,v in list_channel_opt.items() if  ("2tau" in k or "1tau" in k) and v["isSMCSplit"]]},
             #################
             "CMS_ttHl_DYMCNormScaleFactors" : {"correlated" : False, "renameTo" : None               , "proc" : ["DY"], "channels" : ["0l_2tau", "1l_1tau"]},
             "CMS_ttHl_topPtReweighting"     : {"correlated" : True, "renameTo" : None               , "proc" : ["TT"], "channels" : ["0l_2tau", "1l_1tau"]},

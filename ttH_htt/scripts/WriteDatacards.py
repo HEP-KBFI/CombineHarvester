@@ -399,9 +399,9 @@ if shape :
         if ( "HEM" in specific_syst ) and era != 2018:
             print ("skkiping ", specific_syst, "as it is not era 2018")
             continue
-        if "HEM" in specific_syst and stxs :
-            continue
-        if (specific_syst == "CMS_ttHl_Clos_e_shape") and era != 2018:
+        # if "HEM" in specific_syst and stxs : # why should we disable HEM uncertainties for STXS-binned processes?
+        #     continue
+        if (specific_syst == "CMS_ttHl_Clos_e_shape") and era != 2018: #TODO why??
             continue
         if channel not in specific_shape_systs[specific_syst]["channels"] :
             if ( "HEM" in specific_syst ) : print ("WTF", specific_shape_systs[specific_syst]["channels"])
