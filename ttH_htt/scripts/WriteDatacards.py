@@ -192,7 +192,7 @@ if stxs :
       for stxs_key in stxs_pT_bins:
         if xproc.startswith(stxs_key):
           # remove the ttH_br of the list and add the same in a list of pT bins
-          proc_to_remove.append(proc_to_remove)
+          proc_to_remove.append(xproc)
           for pTs in stxs_pT_bins[stxs_key]:
               proc_to_add.append(xproc.replace(stxs_key, pTs))
     for proc in proc_to_remove:
