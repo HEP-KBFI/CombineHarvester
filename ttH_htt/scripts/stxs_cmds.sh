@@ -53,6 +53,7 @@ tar -C $basetopdir -I lz4 -xvf /hdfs/local/karl/archives/HIG-19-008/ttHAnalysis_
 
 rm -f ./compare_histograms.py;
 wget https://raw.githubusercontent.com/HEP-KBFI/tth-htt/dcard_production/scripts/compare_histograms.py
+chmod +x compare_histograms.py
 
 hig_dcards=$HOME/hig-19-008
 if [ ! -d $hig_dcards ]; then
@@ -91,6 +92,7 @@ for era in 2016 2017 2018; do
       merge_htxs_output=$topdir/2020Jun18/datacards/$channel/stxs/${merge_htxs_output_base}.root
       rescaled_htxs=$rescaled_cards/$era/hadd_stage1_rescaled_${subchannel}_stxsMerged.root
       input_orig=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}.root
+      input_noTTH=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}_noTTH.root
 
       if [ ! -f $input_orig ]; then
         echo "No such file: $input_orig"
@@ -101,13 +103,16 @@ for era in 2016 2017 2018; do
         exit 1
       fi
 
+      # remove ttH histograms from the original STXS cards since they're extracted and rescaled in the 2nd input
+      remove_stxs.py $input_orig $input_noTTH
+
       # make sure that there are no common histograms between the two files we're about to hadd
-      nof_lines=$(./compare_histograms.py -i $input_orig -j $rescaled_htxs 2>&1 1>/dev/null | grep "Nothing to compare$" | wc -l)
+      nof_lines=$(./compare_histograms.py -i $input_noTTH -j $rescaled_htxs 2>&1 1>/dev/null | grep "Nothing to compare$" | wc -l)
       if [ "$nof_lines" -ne 1 ]; then
-        echo "Found common histograms between $input_orig and $rescaled_htxs"
+        echo "Found common histograms between $input_noTTH and $rescaled_htxs"
         exit 1
       fi
-      hadd $merge_htxs_output $input_orig $rescaled_htxs;
+      hadd $merge_htxs_output $input_noTTH $rescaled_htxs;
 
       merge_htxs_output_mod=$resultsdir/${merge_htxs_output_base}_mod.root
 
