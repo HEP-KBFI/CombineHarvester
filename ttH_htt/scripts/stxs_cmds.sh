@@ -55,8 +55,10 @@ stxs_map["2los_1tau"]="stxs_2los_1tau_mvaOutput_legacy"
 stxs_map["3l_1tau"]="stxs_3l_1tau_OS_mvaOutput_legacy"
 
 basetopdir=$PWD/cards
-mkdir -p $basetopdir
-tar -C $basetopdir -I lz4 -xvf /hdfs/local/karl/archives/HIG-19-008/ttHAnalysis_stxs_2020Jun18.tar.lz4
+if [ ! -d $basetopdir ]; then
+  mkdir -p $basetopdir
+  tar -C $basetopdir -I lz4 -xvf /hdfs/local/karl/archives/HIG-19-008/ttHAnalysis_stxs_2020Jun18.tar.lz4
+fi
 
 rm -f ./compare_histograms.py;
 wget https://raw.githubusercontent.com/HEP-KBFI/tth-htt/dcard_production/scripts/compare_histograms.py
