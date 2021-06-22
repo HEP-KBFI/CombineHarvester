@@ -32,6 +32,7 @@ parser.add_option("--era",            type="int",          dest="era",         h
 parser.add_option("--tH_kin",         action="store_true", dest="tH_kin",      help="Cards for studies with tH kinematics have specifics", default=False)
 parser.add_option("--HH_kin",         action="store_true", dest="HH_kin",      help="Cards for studies with HH kinematics have specifics", default=False)
 parser.add_option("--stxs",           action="store_true", dest="stxs",        help="Cards for stxs", default=False)
+parser.add_option("--disable-FRxt",   action="store_true", dest="disable_FRxt",help="Disable FRet and FRmt systematics in 2lss+1tau and 3l+1tau", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
 parser.add_option("--signal_type",    type="string",       dest="signal_type", help="Options: \"nonresLO\" | \"nonresNLO\" | \"res\" ", default="none")
@@ -56,6 +57,7 @@ only_BKG_sig = options.only_BKG_sig
 fake_mc      = options.fake_mc
 no_data      = options.no_data
 stxs         = options.stxs
+disable_FRxt = options.disable_FRxt
 tH_kin       = options.tH_kin
 HH_kin       = options.HH_kin
 signal_type  = options.signal_type
@@ -415,6 +417,9 @@ if shape :
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
     for specific_syst in specific_shape_systs :
+        if disable_FRxt and specific_syst in [ "CMS_ttHl_FRet_shift", "CMS_ttHl_FRmt_shift" ]:
+            print("Disabling {}".format(specific_syst))
+            continue
         if era == 2018 and specific_syst == "CMS_ttHl_l1PreFire" :
             continue
         #if "SS" in output_file and ("JER" in specific_syst or "JES" in specific_syst ) and not ( "HEM" in specific_syst )  :
@@ -424,7 +429,7 @@ if shape :
             continue
         # if "HEM" in specific_syst and stxs : # why should we disable HEM uncertainties for STXS-binned processes?
         #     continue
-        if (specific_syst == "CMS_ttHl_Clos_e_shape") and era != 2018: #TODO why??
+        if (specific_syst == "CMS_ttHl_Clos_e_shape") and era != 2018: # Karl: disabled because no trends seen in other eras
             continue
         if channel not in specific_shape_systs[specific_syst]["channels"] :
             if ( "HEM" in specific_syst ) : print ("WTF", specific_shape_systs[specific_syst]["channels"])
