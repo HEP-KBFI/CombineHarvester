@@ -311,9 +311,6 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
             continue
         if not (coupling == "none" or coupling == "kt_1_kv_1") and ("tHq" in obj_name or "tHW" in obj_name) and not coupling in obj_name :
             continue
-        if any(stxs_pT_val in obj_name for stxs_pT_bin in stxs_pT_bins for stxs_pT_val in stxs_pT_bins[stxs_pT_bin]):
-            # do not touch distributions binned according to STXS
-            continue
         ### FIXME: not doing BSM HH
         if "HH" in obj_name and "_kt_" in obj_name :
             continue
@@ -323,6 +320,7 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
             continue
         #if "data_fakes" in obj_name: # FRjt_shape" in obj_name and
         #    print ("===========> TH1F type of ", obj_name)
+        is_stxs = any(stxs_pT_val in obj_name for stxs_pT_bin in stxs_pT_bins for stxs_pT_val in stxs_pT_bins[stxs_pT_bin])
 
         if "Down" in obj_name :
             name_nominal = obj_name.split("_CMS")[0]
@@ -365,59 +363,61 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
                     continue
                 #if "FRjt_shape" in name_up and "data_fakes" in name_up:
                 #    print ("===========> found ", name_up)
-            for binn in xrange(1, histo_do.GetNbinsX() + 1 ) :
-                #if "FRjt_shape" in name_up and "data_fakes" in name_up:
-                #    print ("======> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
-                if nominal.GetBinContent(binn) > 0 :
-                    ## if up or do is zero fixe it
-                    # if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
-                    #     # both up- and down-fluctuations are zero while the nominal is not
-                    #     histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
-                    #     histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
-                    #     did_something_do = 1
-                    #     did_something_up = 1
-                    if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn)) > 0 :
-                        # down-fluctuation zero while nominal and up are not
-                        histo_do.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)  )
-                        # down = nominal / (up/nominal)
+            if not is_stxs:
+                for binn in xrange(1, histo_do.GetNbinsX() + 1 ) :
+                    #if "FRjt_shape" in name_up and "data_fakes" in name_up:
+                    #    print ("======> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                    if nominal.GetBinContent(binn) > 0 :
+                        ## if up or do is zero fixe it
+                        # if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
+                        #     # both up- and down-fluctuations are zero while the nominal is not
+                        #     histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
+                        #     histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
+                        #     did_something_do = 1
+                        #     did_something_up = 1
+                        if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn)) > 0 :
+                            # down-fluctuation zero while nominal and up are not
+                            histo_do.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)  )
+                            # down = nominal / (up/nominal)
+                            did_something_do = 1
+                        if histo_up.GetBinContent(binn) == 0 and abs(histo_do.GetBinContent(binn)) > 0 :
+                            # up-fluctuation zero while nominal and down are not
+                            histo_up.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_do.GetBinContent(binn)  )
+                            # up = nominal/(down/nominal)
+                            did_something_up = 1
+                        ##### then, deflate if too big
+                        # if up/nom > 10: up = 10*nom
+                        # if down/nom > 10: down = 10*nom
+                        if histo_do.GetBinContent(binn)/nominal.GetBinContent(binn) > 100  :
+                            print "WARNING: big shift in template for syst template %s down in process %s : variation = %g"%( name_syst, name_nominal, histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
+                            histo_do.SetBinContent(binn, 100*nominal.GetBinContent(binn)  )
+                            did_something_do = 1
+                        if histo_up.GetBinContent(binn)/nominal.GetBinContent(binn) > 100 :
+                            print "WARNING: big shift in template for syst template %s up in process %s : variation = %g"%( name_syst, name_nominal, histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                            histo_up.SetBinContent(binn, 100*nominal.GetBinContent(binn) )
+                            did_something_up = 1
+                        #####
+                        #if histo_do.GetBinError(binn)/nominal.GetBinContent(binn) > 100  :
+                        #    print "WARNING: big shift in template for syst template %s down in process %s : variation = %g"%( name_syst, name_nominal, histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
+                        #    histo_do.SetBinError(binn, 100*nominal.GetBinContent(binn)  )
+                        #    did_something_do = 1
+                        #if histo_up.GetBinError(binn)/nominal.GetBinContent(binn) > 100 :
+                        #    print "WARNING: big shift in template for syst template %s up in process %s : variation = %g"%( name_syst, name_nominal, histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                        #    histo_up.SetBinError(binn, 100*nominal.GetBinContent(binn) )
+                        #    did_something_up = 1
+                    else :
+                        if nominal.GetBinContent(binn) == 0 and (abs(histo_do.GetBinContent(binn)) > 0 or  abs(histo_up.GetBinContent(binn)) > 0) :
+                            print ("WARNING, nominal is zero while up/do not; up/do = %s/%s. Setting nom/up/do 0.00001 " % (str(histo_do.GetBinContent(binn))  , str(histo_up.GetBinContent(binn))))
+                        histo_up.SetBinContent(binn, 0.00001 )
+                        nominal.SetBinContent(binn, 0.00001 )
+                        histo_do.SetBinContent(binn, 0.00001 )
+                        did_something_nom = 1
                         did_something_do = 1
-                    if histo_up.GetBinContent(binn) == 0 and abs(histo_do.GetBinContent(binn)) > 0 :
-                        # up-fluctuation zero while nominal and down are not
-                        histo_up.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_do.GetBinContent(binn)  )
-                        # up = nominal/(down/nominal)
                         did_something_up = 1
-                    ##### then, deflate if too big
-                    # if up/nom > 10: up = 10*nom
-                    # if down/nom > 10: down = 10*nom
-                    if histo_do.GetBinContent(binn)/nominal.GetBinContent(binn) > 100  :
-                        print "WARNING: big shift in template for syst template %s down in process %s : variation = %g"%( name_syst, name_nominal, histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
-                        histo_do.SetBinContent(binn, 100*nominal.GetBinContent(binn)  )
-                        did_something_do = 1
-                    if histo_up.GetBinContent(binn)/nominal.GetBinContent(binn) > 100 :
-                        print "WARNING: big shift in template for syst template %s up in process %s : variation = %g"%( name_syst, name_nominal, histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
-                        histo_up.SetBinContent(binn, 100*nominal.GetBinContent(binn) )
-                        did_something_up = 1
-                    #####
-                    #if histo_do.GetBinError(binn)/nominal.GetBinContent(binn) > 100  :
-                    #    print "WARNING: big shift in template for syst template %s down in process %s : variation = %g"%( name_syst, name_nominal, histo_do.GetBinContent(binn)/nominal.GetBinContent(binn))
-                    #    histo_do.SetBinError(binn, 100*nominal.GetBinContent(binn)  )
-                    #    did_something_do = 1
-                    #if histo_up.GetBinError(binn)/nominal.GetBinContent(binn) > 100 :
-                    #    print "WARNING: big shift in template for syst template %s up in process %s : variation = %g"%( name_syst, name_nominal, histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
-                    #    histo_up.SetBinError(binn, 100*nominal.GetBinContent(binn) )
-                    #    did_something_up = 1
-                else :
-                    if nominal.GetBinContent(binn) == 0 and (abs(histo_do.GetBinContent(binn)) > 0 or  abs(histo_up.GetBinContent(binn)) > 0) :
-                        print ("WARNING, nominal is zero while up/do not; up/do = %s/%s. Setting nom/up/do 0.00001 " % (str(histo_do.GetBinContent(binn))  , str(histo_up.GetBinContent(binn))))
-                    histo_up.SetBinContent(binn, 0.00001 )
-                    nominal.SetBinContent(binn, 0.00001 )
-                    histo_do.SetBinContent(binn, 0.00001 )
-                    did_something_nom = 1
-                    did_something_do = 1
-                    did_something_up = 1
-                if "data_fakes" in name_up:
-                    print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
+                    if "data_fakes" in name_up:
+                        print ("=========> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
             if did_something_nom == 1 or did_something_up == 1 or did_something_do == 1 :
+                assert(not is_stxs)
                 print ("modified syst templates in ", name_syst, " in process: ", name_nominal, " nom/up/do = ", did_something_nom,  did_something_up, did_something_do)
                 #tfileout.cd(obj0_name)
                 histo_up.Write()
