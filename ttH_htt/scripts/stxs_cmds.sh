@@ -7,6 +7,28 @@ if [[ "$era" != "2016" ]] && [[ "$era" != "2017" ]] && [[ "$era" != "2018" ]]; t
   exit 1;
 fi
 
+shift
+channels_all="0l_2tau 1l_1tau 1l_2tau 2l_2tau 2lss_1tau 2los_1tau 3l_1tau"
+channels_args="$@"
+if [ -z "$channels_args" ]; then
+  channels=$channels_all;
+else
+  for channel_arg in $channels_args; do
+    found_channel=false;
+    for channel in $channels_all; do
+      if [ "$channel_arg" = "$channel" ]; then
+        found_channel=true;
+        break;
+      fi
+    done
+    if [ $found_channel = false ]; then
+      echo "Invalid channel: $channel_arg";
+      exit 1;
+    fi
+  done
+  channels=$channels_args;
+fi
+
 declare -A hadd_map
 hadd_map["0l_2tau"]="Tight_OS/hadd/hadd_stage2_Tight_OS.root"
 hadd_map["1l_1tau"]="Tight_disabled/hadd/hadd_stage2_Tight_disabled.root"
@@ -79,7 +101,7 @@ fi
 topdir=$basetopdir/$era
 mkdir -p $topdir
 
-for channel in 0l_2tau 1l_1tau 1l_2tau 2l_2tau 2lss_1tau 2los_1tau 3l_1tau; do
+for channel in $channels; do
 
   resultsdir=$topdir/2020Jun18/datacards/$channel/results
   mkdir -p $resultsdir
