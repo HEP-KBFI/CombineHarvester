@@ -143,7 +143,7 @@ for channel in $channels; do
       echo "Found common histograms between $input_noTTH and $rescaled_htxs"
       exit 1
     fi
-    hadd $merge_htxs_output $input_noTTH $rescaled_htxs;
+    hadd -f $merge_htxs_output $input_noTTH $rescaled_htxs;
 
     merge_htxs_output_mod_root=$resultsdir/${merge_htxs_output_base}_mod.root
     merge_htxs_output_mod_txt=$resultsdir/${merge_htxs_output_base}_mod.txt
