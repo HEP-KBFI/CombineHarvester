@@ -164,21 +164,21 @@ for channel in $channels; do
     ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
     echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
 
-    if [[ "$channel" = "2lss_1tau" ]] || [[ "$channel" = "3l_1tau" ]]; then
-      # rerunning with --disable-FRxt
-      set -x
-      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --disable-FRxt \
-        --inputShapes $merge_htxs_output --channel $subchannel \
-        --cardFolder $resultsdir \
-        --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_noFRxt.log
-      set +x
-
-      final_results_root_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.root
-      final_results_txt_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.txt
-
-      mv -v $merge_htxs_output_mod_root $final_results_root_noFRxt
-      mv -v $merge_htxs_output_mod_txt  $final_results_txt_noFRxt
-    fi
+#    if [[ "$channel" = "2lss_1tau" ]] || [[ "$channel" = "3l_1tau" ]]; then
+#      # rerunning with --disable-FRxt
+#      set -x
+#      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --disable-FRxt \
+#        --inputShapes $merge_htxs_output --channel $subchannel \
+#        --cardFolder $resultsdir \
+#        --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_noFRxt.log
+#      set +x
+#
+#      final_results_root_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.root
+#      final_results_txt_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.txt
+#
+#      mv -v $merge_htxs_output_mod_root $final_results_root_noFRxt
+#      mv -v $merge_htxs_output_mod_txt  $final_results_txt_noFRxt
+#    fi
 
   done
 
