@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Example usage:
+#
+# stxs_cmds.sh 2016                   # runs 2016, all channels
+# RUN_MINIMAL stxs_cmds.sh 2016       # runs 2016, all channels, also produces datacards with regression bugs
+# stxs_cmds.sh 2016 0l_2tau 2lss_1tau # runs 2016, channels 0l_2tau and 2lss_1tau (incl all its DNN nodes)
+#
+# NB! Before doing anything, you need to first run:
+#
+# rescale_stxs.sh
+#
+# that is stored in 'dcard_production' branch in ttH repository.
+
 era=$1
 
 if [[ "$era" != "2016" ]] && [[ "$era" != "2017" ]] && [[ "$era" != "2018" ]]; then
@@ -163,6 +175,22 @@ for channel in $channels; do
 
     ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
     echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
+
+    if [ "$RUN_MINIMAL" = 1 ]; then
+      # rerunning with --minimal-patch
+      set -x
+      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --minimal-patch \
+        --inputShapes $merge_htxs_output --channel $subchannel \
+        --cardFolder $resultsdir \
+        --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_minimal.log
+      set +x
+
+      final_results_root_minimal=$resultsdir/ttH_${subchannel}_${era}_minimal.root
+      final_results_txt_minimal=$resultsdir/ttH_${subchannel}_${era}_minimal.txt
+
+      mv -v $merge_htxs_output_mod_root $final_results_root_minimal
+      mv -v $merge_htxs_output_mod_txt  $final_results_txt_minimal
+    fi
 
 #    if [[ "$channel" = "2lss_1tau" ]] || [[ "$channel" = "3l_1tau" ]]; then
 #      # rerunning with --disable-FRxt

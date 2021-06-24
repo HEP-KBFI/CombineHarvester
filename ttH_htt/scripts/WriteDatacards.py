@@ -6,6 +6,8 @@ import shutil
 import sys, os, re, shlex
 from subprocess import Popen, PIPE
 
+#TODO: QCD uncertainties for STXS bins!
+
 import os.path
 from os import path
 
@@ -33,6 +35,7 @@ parser.add_option("--tH_kin",         action="store_true", dest="tH_kin",      h
 parser.add_option("--HH_kin",         action="store_true", dest="HH_kin",      help="Cards for studies with HH kinematics have specifics", default=False)
 parser.add_option("--stxs",           action="store_true", dest="stxs",        help="Cards for stxs", default=False)
 parser.add_option("--disable-FRxt",   action="store_true", dest="disable_FRxt",help="Disable FRet and FRmt systematics in 2lss+1tau and 3l+1tau", default=False)
+parser.add_option("--minimal-patch",  action="store_true", dest="minimal_patch",help="Minimal changes wrt published datacards", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
 parser.add_option("--signal_type",    type="string",       dest="signal_type", help="Options: \"nonresLO\" | \"nonresNLO\" | \"res\" ", default="none")
@@ -58,6 +61,7 @@ fake_mc      = options.fake_mc
 no_data      = options.no_data
 stxs         = options.stxs
 disable_FRxt = options.disable_FRxt
+minimal_patch=options.minimal_patch
 tH_kin       = options.tH_kin
 HH_kin       = options.HH_kin
 signal_type  = options.signal_type
@@ -309,19 +313,25 @@ if 0 > 1 : # FIXME: remind why we added that at some point
 # add theory systematics
 for specific_syst in theory_ln_Syst :
     procs = theory_ln_Syst[specific_syst]["proc"]
+    if minimal_patch:
+        if specific_syst == 'QCDscale_ttjets':
+            procs.extend(higgs_procs_plain)
+        elif specific_syst == "QCDscale_qqH":
+            procs = [ "ggH" ]
     if len(procs) == 0 :
         continue
-    if "HH" in procs[0] :
-        for decay in list_channels( analysis, fake_mc )["decays_hh"] :
-            procs = procs + [procs[0] + decay]
-    elif "H" in procs[0] and analysis == "ttH":
-        if tH_kin and ("tHq" in procs[0] or "tHW" in procs[0]) :
-            continue
-        for decay in list_channels( analysis, fake_mc )["decays"] :
-            procs = procs + [procs[0] + decay]
-    else :
-        if procs[0] not in bkg_procs_from_MC :
-            continue
+    for proc in procs:
+        if "HH" == proc :
+            for decay in list_channels( analysis, fake_mc )["decays_hh"] :
+                procs = procs + [proc + decay]
+        elif "H" in proc and analysis == "ttH":
+            if tH_kin and ("tHq" == proc or "tHW" == proc) :
+                continue
+            for decay in list_channels( analysis, fake_mc )["decays"] :
+                procs = procs + [proc + decay]
+        else :
+            if proc not in bkg_procs_from_MC :
+                continue
     if specific_syst == "pdf_qg_2" :
         specific_syst_use = "pdf_qg"
     else :
@@ -331,15 +341,7 @@ for specific_syst in theory_ln_Syst :
 
 if analysis == "HH" :
 
-    specific_syst == "pdf_HH"
-    cb.cp().process(higgs_procs_plain).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
-    print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", higgs_procs_plain)
-
-    specific_syst = "QCDscale_HH"
-    cb.cp().process(higgs_procs_plain).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
-    print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", higgs_procs_plain)
-
-    specific_syst = "TopmassUnc_HH"
+    specific_syst = "pdf_HH"
     cb.cp().process(higgs_procs_plain).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
     print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", higgs_procs_plain)
 
@@ -367,6 +369,14 @@ if analysis == "HH" :
     cb.cp().process(["VH"]).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
     print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", ["VH"])
 
+if analysis == "HH" or minimal_patch:
+    specific_syst = "QCDscale_HH"
+    cb.cp().process(higgs_procs_plain).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
+    print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", higgs_procs_plain)
+
+    specific_syst = "TopmassUnc_HH"
+    cb.cp().process(higgs_procs_plain).AddSyst(cb,  specific_syst, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
+    print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", higgs_procs_plain)
 
 ########################################
 # BR syst
@@ -417,16 +427,34 @@ if shape :
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
     for specific_syst in specific_shape_systs :
-        if disable_FRxt and specific_syst in [ "CMS_ttHl_FRet_shift", "CMS_ttHl_FRmt_shift" ]:
-            print("Disabling {}".format(specific_syst))
-            continue
+        if specific_syst in [ "CMS_ttHl_FRet_shift", "CMS_ttHl_FRmt_shift" ]:
+            assert(not (disable_FRxt and minimal_patch))
+            if disable_FRxt:
+                print("Disabling {}".format(specific_syst))
+                continue
+            elif minimal_patch:
+                if specific_syst == "CMS_ttHl_FRmt_shift":
+                    continue
+                else:
+                    assert(specific_syst == "CMS_ttHl_FRet_shift")
+                    specific_shape_systs[specific_syst]["proc"] = ["data_fakes"]
+                    specific_shape_systs[specific_syst]["channels"] = [ "0l_2tau", "1l_1tau", "1l_2tau", "2l_2tau", "2los_1tau", "3l_1tau" ]
+        if minimal_patch and channel == "3l_1tau":
+            if specific_syst in [ "CMS_ttHl_FRjt_shape", "CMS_ttHl_FRjt_norm" ]:
+                specific_shape_systs[specific_syst]["proc"] = ["data_fakes"]
+            elif specific_syst == "CMS_ttHl_FRjtMC_shape":
+                continue
         if era == 2018 and specific_syst == "CMS_ttHl_l1PreFire" :
             continue
         #if "SS" in output_file and ("JER" in specific_syst or "JES" in specific_syst ) and not ( "HEM" in specific_syst )  :
         #    continue
-        if ( "HEM" in specific_syst ) and era != 2018:
-            print ("skkiping ", specific_syst, "as it is not era 2018")
-            continue
+        if "HEM" in specific_syst:
+            if era != 2018:
+                print ("skkiping ", specific_syst, "as it is not era 2018")
+                continue
+            if minimal_patch:
+                # not in the initial cards for some reaosn
+                continue
         # if "HEM" in specific_syst and stxs : # why should we disable HEM uncertainties for STXS-binned processes?
         #     continue
         if (specific_syst == "CMS_ttHl_Clos_e_shape") and era != 2018: # Karl: disabled because no trends seen in other eras
