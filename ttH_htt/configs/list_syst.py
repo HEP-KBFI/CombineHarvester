@@ -40,7 +40,7 @@ theory_ln_Syst = {
     "QCDscale_ZH"                 : {"value": (0.962 , 1.031),    "proc" : ["ZH"]},
     "pdf_ZH"                      : {"value": 1.016,              "proc" : ["ZH"]},
     "pdf_qqH"                     : {"value": 1.021,              "proc" : ["qqH"]},
-    "QCDscale_qqH"                : {"value": (0.96 , 1.03),      "proc" : ["ggH"]},
+    "QCDscale_qqH"                : {"value": (0.96 , 1.03),      "proc" : ["qqH"]},
     "pdf_ggH"                     : {"value": 1.031,              "proc" : ["ggH"]},
     "QCDscale_ggH"                : {"value": (0.924 , 1.081),    "proc" : ["ggH"]}
     }
