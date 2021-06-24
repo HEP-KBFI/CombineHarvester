@@ -184,7 +184,7 @@ stxs_pT_bins = {
           "ZH_had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25", "ZH_had_GE2J_MJJ_60_120", "ZH_had_GE2J_MJJ_GT350_PTH_GT200",
           "ZH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25", "ZH_had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25",
     ],
-    "ttH" : [ "ttH_PTH_0_60", "ttH_PTH_120_200", "ttH_PTH_200_300", "ttH_PTH_450_infty", "ttH_PTH_60_120", "ttH_PTH_fwd", ],
+    "ttH" : [ "ttH_PTH_0_60", "ttH_PTH_120_200", "ttH_PTH_200_300", "ttH_PTH_300_infty", "ttH_PTH_60_120", "ttH_PTH_fwd", ],
 }
 if stxs :
     # take ttH_ as the pT bins
