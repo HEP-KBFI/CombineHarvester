@@ -198,7 +198,13 @@ for channel in $channels; do
       final_results_root_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.root
       final_results_txt_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.txt
 
-      mv -v $merge_htxs_output_mod_root $final_results_root_minimal
+      merge_htxs_output_noHiggs=$resultsdir/${merge_htxs_output_base}_noHiggs.root
+      merge_htxs_output_stxsOnly=$resultsdir/${merge_htxs_output_base}_stxsOnly.root
+
+      extract_histograms.py $datacard                   $merge_htxs_output_noHiggs  exclude_higgs
+      extract_histograms.py $merge_htxs_output_mod_root $merge_htxs_output_stxsOnly extract_stxs
+      hadd -f $final_results_root_minimal $merge_htxs_output_stxsOnly $merge_htxs_output_noHiggs
+
       mv -v $merge_htxs_output_mod_txt  $final_results_txt_minimal
 
       rename_dcards.py $final_results_txt_minimal
