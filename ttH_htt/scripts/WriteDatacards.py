@@ -101,8 +101,8 @@ else :
     print ("Analysis %s not implemented, should be \"ttH\" or \"HH\"")
     sys.exit()
 
-higgs_procs = list_channels( analysis, fake_mc )["higgs_procs"]
-list_channel_opt   = list_channels( analysis, fake_mc )["info_bkg_channel"]
+higgs_procs = list_channels( analysis, fake_mc, minimal_patch )["higgs_procs"]
+list_channel_opt   = list_channels( analysis, fake_mc, minimal_patch )["info_bkg_channel"]
 bkg_proc_from_data = list_channel_opt[channel]["bkg_proc_from_data"]
 bkg_procs_from_MC  = list_channel_opt[channel]["bkg_procs_from_MC"]
 
@@ -322,12 +322,12 @@ for specific_syst in theory_ln_Syst :
         continue
     for proc in procs:
         if "HH" == proc :
-            for decay in list_channels( analysis, fake_mc )["decays_hh"] :
+            for decay in list_channels( analysis, fake_mc, minimal_patch )["decays_hh"] :
                 procs = procs + [proc + decay]
         elif "H" in proc and analysis == "ttH":
             if tH_kin and ("tHq" == proc or "tHW" == proc) :
                 continue
-            for decay in list_channels( analysis, fake_mc )["decays"] :
+            for decay in list_channels( analysis, fake_mc, minimal_patch )["decays"] :
                 procs = procs + [proc + decay]
         else :
             if proc not in bkg_procs_from_MC :
@@ -438,12 +438,7 @@ if shape :
                 else:
                     assert(specific_syst == "CMS_ttHl_FRet_shift")
                     specific_shape_systs[specific_syst]["proc"] = ["data_fakes"]
-                    specific_shape_systs[specific_syst]["channels"] = [ "0l_2tau", "1l_1tau", "1l_2tau", "2l_2tau", "2los_1tau", "3l_1tau" ]
-        if minimal_patch and channel == "3l_1tau":
-            if specific_syst in [ "CMS_ttHl_FRjt_shape", "CMS_ttHl_FRjt_norm" ]:
-                specific_shape_systs[specific_syst]["proc"] = ["data_fakes"]
-            elif specific_syst == "CMS_ttHl_FRjtMC_shape":
-                continue
+                    #specific_shape_systs[specific_syst]["channels"] = [ "0l_2tau", "1l_1tau", "1l_2tau", "2l_2tau", "2los_1tau", "3l_1tau" ]
         if era == 2018 and specific_syst == "CMS_ttHl_l1PreFire" :
             continue
         #if "SS" in output_file and ("JER" in specific_syst or "JES" in specific_syst ) and not ( "HEM" in specific_syst )  :
@@ -475,6 +470,8 @@ if shape :
 
 ########################################
 # Specific channels lnN syst
+#if minimal_patch:
+#    specific_syst_list["specific_ln_systs"]["CMS_ttHl_fakes"]["channels"].append("3l_1tau")
 specific_ln_systs  = specific_syst_list["specific_ln_systs"]
 for specific_syst in specific_ln_systs :
     if channel not in specific_ln_systs[specific_syst]["channels"] :
@@ -498,6 +495,8 @@ for specific_syst in specific_ln_systs :
 
 ########################################
 finalFile = inputShapes
+#if minimal_patch:
+#    specific_syst_list["specific_ln_to_shape_systs"]["CMS_ttHl_FRjtMC_shape"]["channels"].remove("3l_1tau")
 if list_channel_opt[channel]["isSMCSplit"] :
     print ("Construct templates for fake/gentau systematics:")
     specific_ln_shape_systs    = specific_syst_list["specific_ln_to_shape_systs"]

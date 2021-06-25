@@ -1,4 +1,4 @@
-def list_channels(analysis, fake_mc) :
+def list_channels(analysis, fake_mc, minimal_patch = False) :
     if analysis == "ttH" :
         sigs = ["ttH", "tHq", "tHW", "WH", "ZH", "ggH", "qqH" ] # , "TTWH", "TTZH",
         decays = ["_hww", "_hzz", "_htt", "_hzg", "_hmm" ]
@@ -87,7 +87,7 @@ def list_channels(analysis, fake_mc) :
         "3l_1tau"   : {
             "bkg_proc_from_data" : [ fakes, flips   ],
             "bkg_procs_from_MC"  : [ "TTW", "TTWW", "TTZ", "Rares", "WZ", "ZZ", conversions],
-            "isSMCSplit" : True,
+            "isSMCSplit" : not minimal_patch, # default is True
             "proc_to_remove" : {}
             },
         "2los_1tau" : {
