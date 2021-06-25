@@ -438,7 +438,7 @@ if shape :
                 else:
                     assert(specific_syst == "CMS_ttHl_FRet_shift")
                     specific_shape_systs[specific_syst]["proc"] = ["data_fakes"]
-                    #specific_shape_systs[specific_syst]["channels"] = [ "0l_2tau", "1l_1tau", "1l_2tau", "2l_2tau", "2los_1tau", "3l_1tau" ]
+                    specific_shape_systs[specific_syst]["channels"] = [ "0l_2tau", "1l_1tau", "1l_2tau", "2l_2tau", "2los_1tau", "3l_1tau" ]
         if era == 2018 and specific_syst == "CMS_ttHl_l1PreFire" :
             continue
         #if "SS" in output_file and ("JER" in specific_syst or "JES" in specific_syst ) and not ( "HEM" in specific_syst )  :
