@@ -113,6 +113,14 @@ fi
 topdir=$basetopdir/$era
 mkdir -p $topdir
 
+fullypatched_dir=$basetopdir/fullyPatched
+minimallypatched_dir=$basetopdir/minimallyPatched
+
+mkdir -p $fullypatched_dir
+if [ "$RUN_MINIMAL" = 1 ]; then
+  mkdir -p $minimallypatched_dir
+fi
+
 for channel in $channels; do
 
   resultsdir=$topdir/2020Jun18/datacards/$channel/results
@@ -134,8 +142,8 @@ for channel in $channels; do
     rescaled_htxs=$rescaled_cards/$era/hadd_stage1_rescaled_${subchannel}_stxsMerged.root
     input_orig=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}.root
     input_noTTH=$topdir/2020Jun18/datacards/$channel/stxs/${stxs_map[$subchannel]}_noTTH.root
-    final_results_root=$resultsdir/ttH_${subchannel}_${era}.root
-    final_results_txt=$resultsdir/ttH_${subchannel}_${era}.txt
+    final_results_root=$fullypatched_dir/ttH_${subchannel}_${era}.root
+    final_results_txt=$fullypatched_dir/ttH_${subchannel}_${era}.txt
 
     if [ ! -f $input_orig ]; then
       echo "No such file: $input_orig"
@@ -173,6 +181,8 @@ for channel in $channels; do
     mv -v $merge_htxs_output_mod_root $final_results_root
     mv -v $merge_htxs_output_mod_txt  $final_results_txt
 
+    rename_dcards.py $final_results_txt
+
     ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
     echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
 
@@ -185,11 +195,13 @@ for channel in $channels; do
         --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_minimal.log
       set +x
 
-      final_results_root_minimal=$resultsdir/ttH_${subchannel}_${era}_minimal.root
-      final_results_txt_minimal=$resultsdir/ttH_${subchannel}_${era}_minimal.txt
+      final_results_root_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.root
+      final_results_txt_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.txt
 
       mv -v $merge_htxs_output_mod_root $final_results_root_minimal
       mv -v $merge_htxs_output_mod_txt  $final_results_txt_minimal
+
+      rename_dcards.py $final_results_txt_minimal
     fi
 
 #    if [[ "$channel" = "2lss_1tau" ]] || [[ "$channel" = "3l_1tau" ]]; then
