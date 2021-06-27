@@ -273,8 +273,8 @@ if not no_data :
 cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], bkg_proc_from_data + bkg_procs_from_MC, cats, False)
 if stxs and stxs_as_bkg:
     # split Higgs processes into "signal" and "background"
-    higgs_procs_plain_sig = [ proc for proc in higgs_procs_plain if     proc.startswith("ttH") ]
-    higgs_procs_plain_bkg = [ proc for proc in higgs_procs_plain if not proc.startswith("ttH") ]
+    higgs_procs_plain_sig = [ proc for proc in higgs_procs_plain if     proc.startswith(("ttH", "tHq", "tHW")) ]
+    higgs_procs_plain_bkg = [ proc for proc in higgs_procs_plain if not proc.startswith(("ttH", "tHq", "tHW")) ]
     cb.AddProcesses(['*'], [''], ['13TeV'], [''], higgs_procs_plain_bkg, cats, False)
     cb.AddProcesses(['*'], [''], ['13TeV'], [''], higgs_procs_plain_sig, cats, True)
 else:
