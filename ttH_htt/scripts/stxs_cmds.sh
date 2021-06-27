@@ -169,7 +169,7 @@ for channel in $channels; do
     merge_htxs_output_mod_txt=$resultsdir/${merge_htxs_output_base}_mod.txt
 
     set -x
-    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs \
+    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --stxs-as-bkg \
       --inputShapes $merge_htxs_output --channel $subchannel \
       --cardFolder $resultsdir \
       --noX_prefix --forceModifyShapes &> $logdir/out_$subchannel.log
@@ -188,8 +188,9 @@ for channel in $channels; do
 
     if [ "$RUN_MINIMAL" = 1 ]; then
       # rerunning with --minimal-patch
+      # also consider: --disable-FRxt
       set -x
-      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --minimal-patch \
+      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --minimal-patch --stxs-as-bkg \
         --inputShapes $merge_htxs_output --channel $subchannel \
         --cardFolder $resultsdir \
         --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_minimal.log
@@ -209,22 +210,6 @@ for channel in $channels; do
 
       rename_dcards.py $final_results_txt_minimal
     fi
-
-#    if [[ "$channel" = "2lss_1tau" ]] || [[ "$channel" = "3l_1tau" ]]; then
-#      # rerunning with --disable-FRxt
-#      set -x
-#      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --disable-FRxt \
-#        --inputShapes $merge_htxs_output --channel $subchannel \
-#        --cardFolder $resultsdir \
-#        --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_noFRxt.log
-#      set +x
-#
-#      final_results_root_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.root
-#      final_results_txt_noFRxt=$resultsdir/ttH_${subchannel}_${era}_noFRxt.txt
-#
-#      mv -v $merge_htxs_output_mod_root $final_results_root_noFRxt
-#      mv -v $merge_htxs_output_mod_txt  $final_results_txt_noFRxt
-#    fi
 
   done
 

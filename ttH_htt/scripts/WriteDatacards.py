@@ -36,6 +36,7 @@ parser.add_option("--HH_kin",         action="store_true", dest="HH_kin",      h
 parser.add_option("--stxs",           action="store_true", dest="stxs",        help="Cards for stxs", default=False)
 parser.add_option("--disable-FRxt",   action="store_true", dest="disable_FRxt",help="Disable FRet and FRmt systematics in 2lss+1tau and 3l+1tau", default=False)
 parser.add_option("--minimal-patch",  action="store_true", dest="minimal_patch",help="Minimal changes wrt published datacards", default=False)
+parser.add_option("--stxs-as-bkg",    action="store_true", dest="stxs_as_bkg", help="Consider STXS-binned ggH, qqH, WH, ZH as background", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
 parser.add_option("--signal_type",    type="string",       dest="signal_type", help="Options: \"nonresLO\" | \"nonresNLO\" | \"res\" ", default="none")
@@ -62,6 +63,7 @@ no_data      = options.no_data
 stxs         = options.stxs
 disable_FRxt = options.disable_FRxt
 minimal_patch=options.minimal_patch
+stxs_as_bkg  = options.stxs_as_bkg
 tH_kin       = options.tH_kin
 HH_kin       = options.HH_kin
 signal_type  = options.signal_type
@@ -269,7 +271,14 @@ masses = ["*"]
 if not no_data :
     cb.AddObservations(["*"], ["%sl" % analysis], ["13TeV"], ["*"], cats)
 cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], bkg_proc_from_data + bkg_procs_from_MC, cats, False)
-cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], higgs_procs_plain, cats, True)
+if stxs and stxs_as_bkg:
+    # split Higgs processes into "signal" and "background"
+    higgs_procs_plain_sig = [ proc for proc in higgs_procs_plain if     proc.startswith("ttH") ]
+    higgs_procs_plain_bkg = [ proc for proc in higgs_procs_plain if not proc.startswith("ttH") ]
+    cb.AddProcesses(['*'], [''], ['13TeV'], [''], higgs_procs_plain_bkg, cats, False)
+    cb.AddProcesses(['*'], [''], ['13TeV'], [''], higgs_procs_plain_sig, cats, True)
+else:
+    cb.AddProcesses(    ['*'], [''], ['13TeV'], [''], higgs_procs_plain, cats, True)
 
 #######################################
 print ("Adding lumi syt uncorrelated/year")
