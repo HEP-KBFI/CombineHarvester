@@ -215,10 +215,9 @@ for channel in $channels; do
 
 done
 
-comb_fn=combination.dat
 find $hig_dcards -mindepth 1 -maxdepth 1 -type f \( -name "*cr*" -o -name "*0tau*" -o -name "*4l*" \) -name "*$era*" | sort | xargs -I{} cp -v {} $fullypatched_dir
-combineCards.py $(for fil in `ls $fullypatched_dir/ttH*.txt`; do echo -n ${fil/.txt/}=$fil  \ ;done) > $fullypatched_dir/$comb_fn
+combineCards.py $(for fil in `ls $fullypatched_dir/ttH*$era.txt`; do echo -n ${fil/.txt/}=$fil  \ ;done) > $fullypatched_dir/combination_$era.dat
 if [ "$RUN_MINIMAL" = 1 ]; then
   find $hig_dcards -mindepth 1 -maxdepth 1 -type f \( -name "*cr*" -o -name "*0tau*" -o -name "*4l*" \) -name "*$era*" | sort | xargs -I{} cp -v {} $minimallypatched_dir
-  combineCards.py $(for fil in `ls $minimallypatched_dir/ttH*.txt`; do echo -n ${fil/.txt/}=$fil  \ ;done) > $minimallypatched_dir/$comb_fn
+  combineCards.py $(for fil in `ls $minimallypatched_dir/ttH*$era.txt`; do echo -n ${fil/.txt/}=$fil  \ ;done) > $minimallypatched_dir/combination_$era.dat
 fi
