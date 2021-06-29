@@ -321,6 +321,7 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
         #if "data_fakes" in obj_name: # FRjt_shape" in obj_name and
         #    print ("===========> TH1F type of ", obj_name)
         is_stxs = any(stxs_pT_val in obj_name for stxs_pT_bin in stxs_pT_bins for stxs_pT_val in stxs_pT_bins[stxs_pT_bin])
+        is_stxs = False # actually modify the contents of STXS-binned distributions, in order for the datacard to pass the validation step
 
         if "Down" in obj_name :
             name_nominal = obj_name.split("_CMS")[0]
@@ -369,12 +370,12 @@ def check_systematics (inputShapesL, coupling, stxs_pT_bins) :
                     #    print ("======> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
                     if nominal.GetBinContent(binn) > 0 :
                         ## if up or do is zero fixe it
-                        # if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
-                        #     # both up- and down-fluctuations are zero while the nominal is not
-                        #     histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
-                        #     histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
-                        #     did_something_do = 1
-                        #     did_something_up = 1
+                        if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
+                            # both up- and down-fluctuations are zero while the nominal is not
+                            histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
+                            histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
+                            did_something_do = 1
+                            did_something_up = 1
                         if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn)) > 0 :
                             # down-fluctuation zero while nominal and up are not
                             histo_do.SetBinContent(binn, nominal.GetBinContent(binn)*nominal.GetBinContent(binn)/histo_up.GetBinContent(binn)  )
