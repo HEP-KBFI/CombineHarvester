@@ -169,7 +169,7 @@ for channel in $channels; do
     merge_htxs_output_mod_txt=$resultsdir/${merge_htxs_output_base}_mod.txt
 
     set -x
-    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --stxs-as-bkg \
+    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs \
       --inputShapes $merge_htxs_output --channel $subchannel \
       --cardFolder $resultsdir \
       --noX_prefix --forceModifyShapes &> $logdir/out_$subchannel.log
