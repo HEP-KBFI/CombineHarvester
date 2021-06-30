@@ -208,6 +208,12 @@ if stxs :
     higgs_procs_plain.extend(proc_to_add)
     print ("higgs_procs == ", higgs_procs_plain)
 
+    for stxs_key in stxs_pT_bins:
+        for theory_syst in theory_ln_Syst:
+            if stxs_key in theory_ln_Syst[theory_syst]["proc"]:
+                theory_ln_Syst[theory_syst]["proc"].remove(stxs_key)
+                theory_ln_Syst[theory_syst]["proc"].extend(stxs_pT_bins[stxs_key])
+
 if shape :
     print ("Do not allow Zero shape systematics variations")
     inputShapes = inputShapesRaw.replace(".root", "_mod.root")
