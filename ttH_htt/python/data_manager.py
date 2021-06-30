@@ -75,7 +75,7 @@ def list_proc(syst_list, MC_proc, all_proc_bkg, name_syst) :
         procs = syst_list["proc"]
     return procs
 
-def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_systs, inputShapes, MC_proc, shape, noX_prefix ):
+def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_systs, inputShapes, MC_proc, shape, noX_prefix, minimal_patch = False ):
     created_ln_to_shape_syst = []
     created_shape_to_shape_syst = []
     print ("Doing template to fake/gen tau systematics")
@@ -97,9 +97,10 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
             ## fixme: old cards does not have uniform naming convention to tH/VH -- it should be only continue to conversions
             # do not write Convs -- otherwise it's doubled for 2lss+1tau and 3l+1tau
             if "Convs" in proc :
-                # try : hist = tfile.Get(histFind)
-                # except : print ("Doesn't find" + histFind)
-                # hist.Write()
+                if minimal_patch:
+                    try : hist = tfile.Get(histFind)
+                    except : print ("Doesn't find" + histFind)
+                    hist.Write()
                 continue
             #if  proc or "conversions" in proc or proc in ["tHq", "tHW", "VH"]: continue
             print ("================================================")
@@ -155,10 +156,11 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
                 for proc in MC_proc :
                     # do not write Convs -- otherwise it's doubled for 2lss+1tau and 3l+1tau
                     if "Convs" in proc :
-                        # histFindCentral = "%s" % (proc)
-                        # try : histCentral = tfile.Get(histFindCentral)
-                        # except : print ("Doesn't find" + histFindCentral)
-                        # histCentral.Write()
+                        if minimal_patch:
+                            histFindCentral = "%s" % (proc)
+                            try : histCentral = tfile.Get(histFindCentral)
+                            except : print ("Doesn't find" + histFindCentral)
+                            histCentral.Write()
                         continue
                     histFindCentral = "%s_%s" % (proc, typeHist)
                     try : histCentral = tfile.Get(histFindCentral)

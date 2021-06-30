@@ -510,7 +510,7 @@ if list_channel_opt[channel]["isSMCSplit"] :
     print ("Construct templates for fake/gentau systematics:")
     specific_ln_shape_systs    = specific_syst_list["specific_ln_to_shape_systs"]
     specific_shape_shape_systs = specific_syst_list["specific_shape_to_shape_systs"]
-    finalFile = construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_systs, inputShapes , MC_proc, shape, noX_prefix )
+    finalFile = construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_systs, inputShapes , MC_proc, shape, noX_prefix, minimal_patch )
 
 ########################################
 # bin by bin stat syst
