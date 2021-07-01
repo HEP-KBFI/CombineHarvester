@@ -96,9 +96,9 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
             histDo = ROOT.TH1F()
             ## fixme: old cards does not have uniform naming convention to tH/VH -- it should be only continue to conversions
             if "Convs" in proc :
-                try : hist = tfile.Get(histFind)
-                except : print ("Doesn't find" + histFind)
-                hist.Write()
+                # try : hist = tfile.Get(histFind)
+                # except : print ("Doesn't find" + histFind)
+                # hist.Write()
                 continue
             #if  proc or "conversions" in proc or proc in ["tHq", "tHW", "VH"]: continue
             print ("================================================")
@@ -153,10 +153,10 @@ def construct_templates(cb, ch, specific_ln_shape_systs, specific_shape_shape_sy
                 #    name_syst = name_syst.replace("%sl" % analysis, "%sl%s" % (analysis, str(era - 2000)))
                 for proc in MC_proc :
                     if "Convs" in proc :
-                        histFindCentral = "%s" % (proc)
-                        try : histCentral = tfile.Get(histFindCentral)
-                        except : print ("Doesn't find" + histFindCentral)
-                        histCentral.Write()
+                        # histFindCentral = "%s" % (proc)
+                        # try : histCentral = tfile.Get(histFindCentral)
+                        # except : print ("Doesn't find" + histFindCentral)
+                        # histCentral.Write()
                         continue
                     histFindCentral = "%s_%s" % (proc, typeHist)
                     try : histCentral = tfile.Get(histFindCentral)
@@ -461,7 +461,13 @@ def check_systematics (inputShapesL, coupling, analysis = "ttH", newmethod=False
                 #    print ("======> ", name_up, nominal.GetBinContent(binn), histo_do.GetBinContent(binn), histo_up.GetBinContent(binn), histo_do.GetBinError(binn), histo_up.GetBinError(binn), histo_do.GetBinContent(binn)/nominal.GetBinContent(binn), histo_up.GetBinContent(binn)/nominal.GetBinContent(binn))
                 if nominal.GetBinContent(binn) > 0 :
                     ## if up or do is zero fixe it
-                    if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn) > 0) :
+                    if histo_do.GetBinContent(binn) == 0 and histo_up.GetBinContent(binn) == 0:
+                        # both up- and down-fluctuations are zero while the nominal is not
+                        histo_do.SetBinContent(binn, nominal.GetBinContent(binn))
+                        histo_up.SetBinContent(binn, nominal.GetBinContent(binn))
+                        did_something_do = 1
+                        did_something_up = 1
+                    if histo_do.GetBinContent(binn) == 0 and abs(histo_up.GetBinContent(binn)) > 0 :
                         if newmethod:
                             newbincont = nominal.GetBinContent(binn) - (histo_up.GetBinContent(binn) - nominal.GetBinContent(binn))
                         else:

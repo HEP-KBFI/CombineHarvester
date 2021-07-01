@@ -45,7 +45,7 @@ def list_channels( fake_mc, signal_type="none", mass="none", HHtype="none", rena
 
     #---> by now not used, we may use to implement systematics/BR -- see how decays_hh is used in WriteDatacards
     #higgs_procs = [ [y + x  for x in decays if not (x in ["hzg", "hmm"] and y != "ttH")] for y in sigs]
-    higgs_procs = [ [y + x  for x in decays if not (x in ["hzg", "hmm"])] for y in sigs]
+    higgs_procs = [ [y + x  for x in decays if not (x in ["_hzg", "_hmm"])] for y in sigs]
 
     prefix_VBF = "signal_vbf_nonresonant"
     SM_VBF     = "1_1_1"
