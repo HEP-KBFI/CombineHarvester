@@ -40,67 +40,131 @@ Clos_e_norm_ln_Syst = {
     "3l" : {"2016": 1.0453 , "2017": 1.0944, "2018": 1.0485}
 }
 theory_ln_Syst = {
-    #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
-    "QCDscale_tt" : {"value": (0.965 , 1.024),    "proc" : ["TT"]},
-    "pdf_tt"      : {"value": 1.042,              "proc" : ["TT"]}, # includes alpha s
-    "m_top_unc_tt": {"value": (0.973,1.028),        "proc" : ["TT"]},
-#https://arxiv.org/pdf/1610.07922.pdf
-    "QCDscale_ttZ"                : {"value": (0.887 , 1.096),    "proc" : ["TTZ"]}, # old (0.887 , 1.096) # mod 0.898 , 1.096
-    "QCDscale_ttW"                : {"value": (0.885 , 1.129),    "proc" : ["TTW"]}, # old (0.885 , 1.129) # mod 0.897 , 1.129
+    # pdg uncertainties grouped (values see below in old uncertainties or systematic recommendation: https://gitlab.cern.ch/hh/naming-conventions):
+    # pdf_gg
+    "pdf_gg"                               : {"value": 1.042,              "proc" : ["TT"]}, # includes alpha s 
+    "pdf_gg"                               : {"value": 1.04,               "proc" : ["TTZ"]},  # includes alpha s 
+    "pdf_gg"                               : {"value": 1.173,              "proc" : ["ggZZ"]},
+    # pdf_qqbar
+    "pdf_qqbar"                            : {"value": 1.044,              "proc" : ["WZ"]},
+    "pdf_qqbar"                            : {"value": 1.0314,             "proc" : ["qqZZ"]},
+    "pdf_qqbar"                            : {"value": 1.034,              "proc" : ["TTW"]},  
+    #pdf_Higgs_gg
+    "pdf_Higgs_gg"                         : {"value": 1.019,              "proc" : ["ggH"]},
+    #pdf_Higgs_qqbar
+    "pdf_Higgs_qqbar"                      : {"value": 1.021,              "proc" : ["qqH"]},
+    "pdf_Higgs_qqbar"                      : {"value": 1.013,              "proc" : ["ZH"]},
+    "pdf_Higgs_qqbar"                      : {"value": 1.017,              "proc" : ["WH"]},
+    #pdf_Higgs_ttH
+    "pdf_Higgs_ttH"                        : {"value": 1.03,               "proc" : ["TTH","ttH"]},
+    "pdf_Higgs_ttH"                        : {"value": 1.035,              "proc" : ["tHq"]},
+    "pdf_Higgs_ttH"                        : {"value": 1.061,              "proc" : ["tHW"]},
+    #pdf_Higgs_ggHH
+    "pdf_Higgs:ggHH"                       : {"value": 1.021,              "proc" : ["ggHH"]},
+    #pdf_Higgs_qqHH
+    "pdf_Higgs_qqHH"                       : {"value": 1.021,              "proc" : ["qqHH"]}, # includes alpha s
+    # QCDscale uncertainties grouped (values see below in old uncertainties or systematic recommendation: https://gitlab.cern.ch/hh/naming-conventions):
+    #QCDscale_ttbar
+    "QCDscale_ttbar"                       : {"value": (0.965 , 1.024),    "proc" : ["TT"]},
+    "QCDscale_ttbar"                       : {"value": (0.887 , 1.096),    "proc" : ["TTZ"]},
+    "QCDscale_ttbar"                       : {"value": (0.885 , 1.129),    "proc" : ["TTW"]},
+    #QCDscale_VV
+    "QCDscale_VV"                          : {"value": (0.967,1.038),      "proc" : ["WZ"]},
+    "QCDscale_VV"                          : {"value": (0.9868,1.0208),    "proc" : ["qqZZ"]},
+    "QCDscale_VV"                          : {"value": (0.823,1.236),      "proc" : ["ggZZ"]},
+    #QCDscale_ggH
+    "QCDscale_ggH"                         : {"value": 1.039,              "proc" : ["ggH"]},
+    #QCDscale_qqH
+    "QCDscale_qqH"                         : {"value": (0.997,1.004),      "proc" : ["qqH"]},
+    #QCDscale_VH
+    "QCDscale_VH"                          : {"value": (0.970,1.038),      "proc" : ["ZH"]},
+    "QCDscale_VH"                          : {"value": (0.993,1.005),      "proc" : ["WH"]},
+    #QCDscale_ttH
+    "QCDscale_ttH"                         : {"value": (0.908,1.058),      "proc" : ["TTH","ttH"]},
+    "QCDscale_ttH"                         : {"value": (0.853, 1.065),     "proc" : ["tHq"]},
+    "QCDscale_ttH"                         : {"value": (0.933, 1.049),     "proc" : ["tHW"]},
+    #QCDscale_ggHH
+    "QCDscale_ggHH"                        : {"value": (0.95 , 1.022),     "proc" : ["ggHH"]}, 
+    #QCDscale_ggHH
+    "QCDscale_qqHH"                        : {"value": (0.9996 , 1.0003),  "proc" : ["qqHH"]}, 
+    # alpha_s uncertainties grouped (values see below in old uncertainties or systematic recommendation: https://gitlab.cern.ch/hh/naming-conventions):
+    #alpha_s
+    "alpha_s"                              : {"value": 1.026,              "proc" : ["ggH"]},
+    "alpha_s"                              : {"value": 1.005,              "proc" : ["qqH"]},
+    "alpha_s"                              : {"value": 1.009,              "proc" : ["WH"]},
+    "alpha_s"                              : {"value": 1.009,              "proc" : ["ZH"]},
+    "alpha_s"                              : {"value": 1.015,              "proc" : ["tHW"]}, 
+    "alpha_s"                              : {"value": 1.012,              "proc" : ["tHq"]},
+    "alpha_s"                              : {"value": 1.02,               "proc" : ["TTH","ttH"]},
+    #alpha_s_ggHH
+    "alpha_s_ggHH"                         : {"value": 1.021,              "proc" : ["ggHH"]},
+    #other theo unc
+    "m_top_unc_tt"                         : {"value": (0.973,1.028),      "proc" : ["TT"]},
+    "m_top_unc_ggHH"                       : {"value": 1.026,              "proc" : ["ggHH"]},
+    "EW_corr_ttZ"                          : {"value": (0.998,1.0),        "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
+    "EW_corr_ttW"                          : {"value": (0.968,1.0),        "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
+#     #https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
+#     "QCDscale_tt" : {"value": (0.965 , 1.024),    "proc" : ["TT"]},
+#     "pdf_tt"      : {"value": 1.042,              "proc" : ["TT"]}, # includes alpha s
+#     "m_top_unc_tt": {"value": (0.973,1.028),        "proc" : ["TT"]},
+#     #https://arxiv.org/pdf/1610.07922.pdf
+#     "QCDscale_ttZ"                : {"value": (0.887 , 1.096),    "proc" : ["TTZ"]}, # old (0.887 , 1.096) # mod 0.898 , 1.096
+#     "QCDscale_ttW"                : {"value": (0.885 , 1.129),    "proc" : ["TTW"]}, # old (0.885 , 1.129) # mod 0.897 , 1.129
 
-    "pdf_ttZ"                     : {"value": 1.04,              "proc" : ["TTZ"]},  # includes alpha s 
-    "pdf_ttW"                     : {"value": 1.034,               "proc" : ["TTW"]},  
+#     "pdf_ttZ"                     : {"value": 1.04,              "proc" : ["TTZ"]},  # includes alpha s 
+#     "pdf_ttW"                     : {"value": 1.034,               "proc" : ["TTW"]},  
   
-    "EW_corr_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
-    "EW_corr_ttW"                      : {"value": (0.968,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
+#     "EW_corr_ttZ"                      : {"value": (0.998,1.0),               "proc" : ["TTZ"]},  # old (0.998,1.0) #mod 0.998,1.0
+#     "EW_corr_ttW"                      : {"value": (0.968,1.0),               "proc" : ["TTW"]},  # old (0.968,1.0) # mod 0.969,1.0
 
-    "pdf_ggHH"                      : {"value": 1.021,               "proc" : ["ggHH"]},
-    "QCDscale_ggHH"                 : {"value": (0.95 , 1.022),     "proc" : ["ggHH"]}, # old (0.95 , 1.022) # mod 0.95 , 1.022
-    "alpha_s_ggHH"                    : {"value": 1.021,              "proc" : ["ggHH"]},
-    "m_top_unc_ggHH"               : {"value": 1.026,              "proc" : ["ggHH"]},
-    "pdf_qqHH"                      : {"value": 1.021,               "proc" : ["qqHH"]}, # includes alpha s
-    "QCDscale_qqHH"                 : {"value": (0.9996 , 1.0003),     "proc" : ["qqHH"]}, # old (0.996 , 1.003) # mod 0.996 , 1.003
-    # higgs https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV (mh = 125.09) updated with combination recommendations (https://gitlab.cern.ch/hh/naming-conventions/-)
-    "alpha_s_ggH"                    : {"value": 1.026,              "proc" : ["ggH"]},
-    "pdf_ggH"                     : {"value": 1.019,              "proc" : ["ggH"]},
-    "QCDscale_ggH"                : {"value": 1.039,    "proc" : ["ggH"]}, # old (0.924 , 1.081) #mod 0.929 , 1.081
+#     "pdf_ggHH"                      : {"value": 1.021,               "proc" : ["ggHH"]},
+#     "QCDscale_ggHH"                 : {"value": (0.95 , 1.022),     "proc" : ["ggHH"]}, # old (0.95 , 1.022) # mod 0.95 , 1.022
+#     "alpha_s_ggHH"                    : {"value": 1.021,              "proc" : ["ggHH"]},
+#     "m_top_unc_ggHH"               : {"value": 1.026,              "proc" : ["ggHH"]},
+#     "pdf_qqHH"                      : {"value": 1.021,               "proc" : ["qqHH"]}, # includes alpha s
+#     "QCDscale_qqHH"                 : {"value": (0.9996 , 1.0003),     "proc" : ["qqHH"]}, # old (0.996 , 1.003) # mod 0.996 , 1.003
+#     # higgs https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt13TeV (mh = 125.09) updated with combination recommendations (https://gitlab.cern.ch/hh/naming-conventions/-)
+#     "alpha_s_ggH"                    : {"value": 1.026,              "proc" : ["ggH"]},
+#     "pdf_ggH"                     : {"value": 1.019,              "proc" : ["ggH"]},
+#     "QCDscale_ggH"                : {"value": 1.039,    "proc" : ["ggH"]}, # old (0.924 , 1.081) #mod 0.929 , 1.081
 
-    "pdf_qqH"                     : {"value": 1.021,              "proc" : ["qqH"]},
-    "QCDscale_qqH"                : {"value": (0.997,1.004),      "proc" : ["qqH"]}, # (0.96 , 1.03) #mod 0.962 , 1.03
-    "alpha_s_qqH"                    : {"value": 1.005,              "proc" : ["qqH"]},
+#     "pdf_qqH"                     : {"value": 1.021,              "proc" : ["qqH"]},
+#     "QCDscale_qqH"                : {"value": (0.997,1.004),      "proc" : ["qqH"]}, # (0.96 , 1.03) #mod 0.962 , 1.03
+#     "alpha_s_qqH"                    : {"value": 1.005,              "proc" : ["qqH"]},
 
-    "QCDscale_WH"                 : {"value": (0.993,1.005),      "proc" : ["WH"]}, # old (0.95 , 1.07) # mod 0.952 , 1.07
-    "pdf_WH"                      : {"value": 1.017,              "proc" : ["WH"]},
-    "alpha_s_WH"                    : {"value": 1.009,              "proc" : ["WH"]},
-    "QCDscale_ZH"                 : {"value": (0.970,1.038),    "proc" : ["ZH"]}, # (0.962 , 1.03) # mod 0.963 , 1.03
-    "pdf_ZH"                      : {"value": 1.013,              "proc" : ["ZH"]},
-    "alpha_s_ZH"                    : {"value": 1.009,              "proc" : ["ZH"]},
+#     "QCDscale_WH"                 : {"value": (0.993,1.005),      "proc" : ["WH"]}, # old (0.95 , 1.07) # mod 0.952 , 1.07
+#     "pdf_WH"                      : {"value": 1.017,              "proc" : ["WH"]},
+#     "alpha_s_WH"                    : {"value": 1.009,              "proc" : ["WH"]},
+#     "QCDscale_ZH"                 : {"value": (0.970,1.038),    "proc" : ["ZH"]}, # (0.962 , 1.03) # mod 0.963 , 1.03
+#     "pdf_ZH"                      : {"value": 1.013,              "proc" : ["ZH"]},
+#     "alpha_s_ZH"                    : {"value": 1.009,              "proc" : ["ZH"]},
 
-    "QCDscale_ttH"                : {"value": (0.908,1.058),    "proc" : ["TTH","ttH"]}, # old (0.908 , 1.058) # mod 0.916 , 1.058
-    "pdf_ttH"               : {"value": 1.03,              "proc" : ["TTH","ttH"]},
-    "alpha_s_ttH"                    : {"value": 1.02,              "proc" : ["TTH","ttH"]},
+#     "QCDscale_ttH"                : {"value": (0.908,1.058),    "proc" : ["TTH","ttH"]}, # old (0.908 , 1.058) # mod 0.916 , 1.058
+#     "pdf_ttH"               : {"value": 1.03,              "proc" : ["TTH","ttH"]},
+#     "alpha_s_ttH"                    : {"value": 1.02,              "proc" : ["TTH","ttH"]},
 
-    "QCDscale_tHq"                : {"value": (0.853, 1.065),     "proc" : ["tHq"]}, # old (0.853, 1.065) #mod 0.872, 1.065
-    "pdf_tHq"                      : {"value": 1.035,               "proc" : ["tHq"]},
-    "alpha_s_tHq"                    : {"value": 1.012,              "proc" : ["tHq"]},
+#     "QCDscale_tHq"                : {"value": (0.853, 1.065),     "proc" : ["tHq"]}, # old (0.853, 1.065) #mod 0.872, 1.065
+#     "pdf_tHq"                      : {"value": 1.035,               "proc" : ["tHq"]},
+#     "alpha_s_tHq"                    : {"value": 1.012,              "proc" : ["tHq"]},
 
-    "QCDscale_tHW"                : {"value": (0.933, 1.049),     "proc" : ["tHW"]}, # old (0.933, 1.049) # mod 0.937, 1.049
-    "pdf_tHW"                    : {"value": 1.061,              "proc" : ["tHW"]},
-    "alpha_s_tHW"                    : {"value": 1.015,              "proc" : ["tHW"]}, 
-#Andrew
-    "QCDscale_ggZZ"                      : {"value": (0.823,1.236),              "proc" : ["ggZZ"]}, # old (0.823,1.236) # mod 0.85,1.236
-    "pdf_ggZZ"                 : {"value": 1.173,              "proc" : ["ggZZ"]},
-    "QCDscale_qqZZ"                      : {"value": (0.9868,1.0208),              "proc" : ["qqZZ"]}, # old (0.9868,1.0208) # mod 0.9869,1.0208
-    #"EW_corr_ggZZ"                 : {"value": 1.,              "proc" : ["ggZZ"]}, # ?
-    "pdf_qqZZ"                 : {"value": 1.0314,              "proc" : ["qqZZ"]},
-   # "EW_corr_qqZZ"                 : {"value": 1.,              "proc" : ["qqZZ"]},# ?
-    "QCDscale_WZ"                      : {"value": (0.967,1.038),              "proc" : ["WZ"]}, #old (0.967,1.038) #mod 0.968,1.038
-    "pdf_WZ"                 : {"value": 1.044,              "proc" : ["WZ"]},
-# other WZ/ZZ
+#     "QCDscale_tHW"                : {"value": (0.933, 1.049),     "proc" : ["tHW"]}, # old (0.933, 1.049) # mod 0.937, 1.049
+#     "pdf_tHW"                    : {"value": 1.061,              "proc" : ["tHW"]},
+#     "alpha_s_tHW"                    : {"value": 1.015,              "proc" : ["tHW"]}, 
 
-#    "CMS_WZ_theo"  : {"value" : 1.07,             "proc" : ["WZ"]},
-    #"pdf_VV"       : {"value" : 0.180837,0.253523,"proc" : ["VV"]},
-    #"QCDscale_VV"  : {"value" : 0.317419,         "proc" : ["VV"]},
+# #Andrew
+#     "QCDscale_ggZZ"                      : {"value": (0.823,1.236),              "proc" : ["ggZZ"]}, # old (0.823,1.236) # mod 0.85,1.236
+#     "pdf_ggZZ"                 : {"value": 1.173,              "proc" : ["ggZZ"]},
+#     "QCDscale_qqZZ"                      : {"value": (0.9868,1.0208),              "proc" : ["qqZZ"]}, # old (0.9868,1.0208) # mod 0.9869,1.0208
+#     #"EW_corr_ggZZ"                 : {"value": 1.,              "proc" : ["ggZZ"]}, # ?
+#     "pdf_qqZZ"                 : {"value": 1.0314,              "proc" : ["qqZZ"]},
+#    # "EW_corr_qqZZ"                 : {"value": 1.,              "proc" : ["qqZZ"]},# ?
+#     "QCDscale_WZ"                      : {"value": (0.967,1.038),              "proc" : ["WZ"]}, #old (0.967,1.038) #mod 0.968,1.038
+#     "pdf_WZ"                 : {"value": 1.044,              "proc" : ["WZ"]},
+# # other WZ/ZZ
+
+# #    "CMS_WZ_theo"  : {"value" : 1.07,             "proc" : ["WZ"]},
+#     #"pdf_VV"       : {"value" : 0.180837,0.253523,"proc" : ["VV"]},
+#     #"QCDscale_VV"  : {"value" : 0.317419,         "proc" : ["VV"]},
     }
 
 ## --- BR(H->XX)/BR_sm(H->XX) = (kappa_X)^2 -------------------------------------------------------------- ##
