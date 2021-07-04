@@ -192,6 +192,53 @@ stxs_pT_bins = {
     ],
     "ttH" : [ "ttH_PTH_0_60", "ttH_PTH_120_200", "ttH_PTH_200_300", "ttH_PTH_300_infty", "ttH_PTH_60_120", "ttH_PTH_fwd", ],
 }
+
+stxs_grouping = {
+    'ggH_scale_0jet' :        [ 'GG2H_0J_PTH_0_10', 'GG2H_0J_PTH_GT10' ],
+    'ggH_scale_1jet_lowpt' :  [ 'GG2H_1J_PTH_0_60', 'GG2H_1J_PTH_60_120', 'GG2H_1J_PTH_120_200' ],
+    'ggH_scale_2jet_lowpt' :  [ 'GG2H_GE2J_MJJ_0_350_PTH_0_60', 'GG2H_GE2J_MJJ_0_350_PTH_60_120', 'GG2H_GE2J_MJJ_0_350_PTH_120_200' ],
+    'ggH_scale_highpt' :      [ 'GG2H_PTH_200_300', 'GG2H_PTH_300_450' ],
+    'ggH_scale_very_highpt' : [ 'GG2H_PTH_450_650', 'GG2H_PTH_GT650' ],
+    'ggH_scale_vbf' :         [ 'GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25', 'GG2H_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25', 'GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25', 'GG2H_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25' ],
+
+    'vbf_scale_0jet' :           [ 'QQ2HQQ_0J' ],
+    'vbf_scale_1jet' :           [ 'QQ2HQQ_1J' ],
+    'vbf_scale_lowmjj' :         [ 'QQ2HQQ_GE2J_MJJ_0_60', 'QQ2HQQ_GE2J_MJJ_60_120', 'QQ2HQQ_GE2J_MJJ_120_350' ],
+    'vbf_scale_highmjj_lowpt' :  [ 'QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25', 'QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25', 'QQ2HQQ_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25', 'QQ2HQQ_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25' ],
+    'vbf_scale_highmjj_highpt' : [ 'QQ2HQQ_GE2J_MJJ_GT350_PTH_GT200' ],
+
+    'VH_scale_0jet' :           [ 'had_0J' ],
+    'VH_scale_1jet' :           [ 'had_1J' ],
+    'VH_scale_lowmjj' :         [ 'had_GE2J_MJJ_0_60', 'had_GE2J_MJJ_60_120', 'had_GE2J_MJJ_120_350' ],
+    'VH_scale_highmjj_lowpt' :  [ 'had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_0_25', 'had_GE2J_MJJ_350_700_PTH_0_200_PTHJJ_GT25', 'had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_0_25', 'had_GE2J_MJJ_GT700_PTH_0_200_PTHJJ_GT25' ],
+    'VH_scale_highmjj_highpt' : [ 'had_GE2J_MJJ_GT350_PTH_GT200' ],
+
+    'WH_scale_lowpt' :  [ 'PTV_0_75', 'PTV_75_150', 'PTV_150_250_0J', 'PTV_150_250_GE1J' ],
+    'WH_scale_highpt' : [ 'PTV_GT250' ],
+    'ZH_scale_lowpt' :  [ 'PTV_0_75', 'PTV_75_150', 'PTV_150_250_0J', 'PTV_150_250_GE1J', 'GG2HLL_PTV_0_75', 'GG2HLL_PTV_75_150', 'GG2HLL_PTV_150_250_0J', 'GG2HLL_PTV_150_250_GE1J' ],
+    'ZH_scale_highpt' : [ 'PTV_GT250', 'GG2HLL_PTV_GT250' ],
+
+    'ttH_scale_lowpt'  : [ 'PTH_0_60', 'PTH_60_120', 'PTH_120_200', 'PTH_200_300' ],
+    'ttH_scale_highpt' : [ 'PTH_300_infty' ],
+}
+
+for unc_name in stxs_grouping:
+    pfxs = []
+    if unc_name.startswith('VH'):
+        pfxs.extend([ 'WH', 'ZH' ])
+    elif unc_name.startswith('vbf'):
+        pfxs.append('qqH')
+    else:
+        pfxs.append(unc_name.split('_')[0])
+    stxs_cats = [ '{}_{}'.format(pfx, stxs_cat) for stxs_cat in stxs_grouping[unc_name] for pfx in pfxs ]
+    stxs_grouping[unc_name] = stxs_cats
+
+stxs_group_map = {}
+for group_name, group_list in stxs_grouping.items():
+    for stxs_cat in group_list:
+        assert(stxs_cat not in stxs_group_map)
+        stxs_group_map[stxs_cat] = group_name
+
 if stxs :
     # take ttH_ as the pT bins
     proc_to_remove = []
@@ -439,6 +486,11 @@ if shape :
     #    print ("added " + MC_shape_syst + " as shape uncertainty to the MC processes")
     ########################################
     # channel specific estimated shape syst
+    if not stxs:
+        # these nuisances were not present in the original STXS-inclusive datacards
+        specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ggH"]["channels"] = []
+        specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_qqH"]["channels"] = []
+        specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_VH"]["channels"] = []
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
     for specific_syst in specific_shape_systs :
@@ -574,6 +626,27 @@ if shape :
             print ("skkiping ", specific_syst, "as it is not era 2018")
         #if "HEM" in specific_syst and stxs :
         #    continue
+
+        if stxs and specific_syst.startswith("CMS_ttHl_thu_shape") and specific_syst.endswith(("ttH", "ggH", "qqH", "VH")):
+            stxs_groups = {}
+            procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+            for proc in procs:
+                proc_found = False
+                for stxs_proc in stxs_group_map:
+                    if proc.startswith(stxs_proc):
+                        stxs_unc = stxs_group_map[stxs_proc]
+                        if stxs_unc not in stxs_groups:
+                            stxs_groups[stxs_unc] = []
+                        stxs_groups[stxs_unc].append(proc)
+                        proc_found = True
+                        break
+                if not proc_found:
+                    raise RuntimeError("Could not find any STXS uncertainty for process: %s" % proc)
+            for stxs_unc in stxs_groups:
+                cb.cp().process(stxs_groups[stxs_unc]).RenameSystematic(cb, specific_syst, stxs_unc)
+                print("Renamed {} to {} for: {}".format(specific_syst, stxs_unc, ', '.join(stxs_groups[stxs_unc])))
+            continue
+
         if specific_shape_systs[specific_syst]["correlated"] and specific_shape_systs[specific_syst]["renameTo"] == None :
             continue
         #################

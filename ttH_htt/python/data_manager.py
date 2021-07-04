@@ -65,9 +65,9 @@ def lists_overlap(a, b):
 def list_proc(syst_list, MC_proc, all_proc_bkg, name_syst) :
     if syst_list["proc"] == "MCproc" :
         procs = MC_proc
-    elif syst_list["proc"] in [ "ttHproc", "tHqproc", "tHWproc", "HHproc" ]:
+    elif syst_list["proc"] in [ "ttHproc", "tHqproc", "tHWproc", "HHproc", "ggHproc", "qqHproc", "VHproc" ]:
         proc_signal_plus_data_bkg = list(set(MC_proc) - set(all_proc_bkg))
-        proc_pfx = '{}_'.format(syst_list["proc"].replace('proc', ''))
+        proc_pfx = ('WH_', 'ZH_') if syst_list["proc"] == "VHproc" else '{}_'.format(syst_list["proc"].replace('proc', ''))
         procs = [ proc for proc in proc_signal_plus_data_bkg if proc.startswith(proc_pfx) ]
         if not procs:
             print("Skipping {} because unable to find processes that start with {} from: {}".format(
