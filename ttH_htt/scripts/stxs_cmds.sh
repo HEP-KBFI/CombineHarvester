@@ -176,15 +176,15 @@ for channel in $channels; do
     set +x
 
     datacard=$hig_dcards/ttH_${subchannel}_${era}.root
-    diff_txt=$topdir/diff_${era}_${subchannel}.txt
+#    diff_txt=$topdir/diff_${era}_${subchannel}.txt
 
     sort_histograms.py $merge_htxs_output_mod_root $final_results_root
     mv -v $merge_htxs_output_mod_txt  $final_results_txt
 
     rename_dcards.py $final_results_txt
 
-    ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
-    echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
+#    ./compare_histograms.py -i $final_results_root -j $datacard -d ttH_${subchannel} -D ttH_${subchannel} &> $diff_txt
+#    echo "RESULT: $era $subchannel ( $diff_txt )  -> $(grep -v Comparing $diff_txt | wc -l)"
 
     if [ "$RUN_MINIMAL" = 1 ]; then
       # rerunning with --minimal-patch
