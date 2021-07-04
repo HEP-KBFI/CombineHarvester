@@ -178,7 +178,7 @@ for channel in $channels; do
     datacard=$hig_dcards/ttH_${subchannel}_${era}.root
     diff_txt=$topdir/diff_${era}_${subchannel}.txt
 
-    mv -v $merge_htxs_output_mod_root $final_results_root
+    sort_histograms.py $merge_htxs_output_mod_root $final_results_root
     mv -v $merge_htxs_output_mod_txt  $final_results_txt
 
     rename_dcards.py $final_results_txt
@@ -196,15 +196,18 @@ for channel in $channels; do
         --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_minimal.log
       set +x
 
-      final_results_root_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.root
-      final_results_txt_minimal=$minimallypatched_dir/ttH_${subchannel}_${era}.txt
+      final_results_root_minimal_base=$minimallypatched_dir/ttH_${subchannel}_${era}
+      final_results_root_minimal_unsorted=${final_results_root_minimal_base}_unsorted.root
+      final_results_root_minimal=${final_results_root_minimal_base}.root
+      final_results_txt_minimal=${final_results_root_minimal_base}.txt
 
       merge_htxs_output_noHiggs=$resultsdir/${merge_htxs_output_base}_noHiggs.root
       merge_htxs_output_stxsOnly=$resultsdir/${merge_htxs_output_base}_stxsOnly.root
 
       extract_histograms.py $datacard                   $merge_htxs_output_noHiggs  exclude_higgs
       extract_histograms.py $merge_htxs_output_mod_root $merge_htxs_output_stxsOnly extract_stxs
-      hadd -f $final_results_root_minimal $merge_htxs_output_stxsOnly $merge_htxs_output_noHiggs
+      hadd -f $final_results_root_minimal_unsorted $merge_htxs_output_stxsOnly $merge_htxs_output_noHiggs
+      sort_histograms.py $final_results_root_minimal_unsorted $final_results_root_minimal
 
       mv -v $merge_htxs_output_mod_txt  $final_results_txt_minimal
 
