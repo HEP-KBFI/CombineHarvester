@@ -497,6 +497,7 @@ if shape :
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttH"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHq"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHW"]["channels"] = []
+            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_HH"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttW"]["proc"] = [ "TTW", "TTWW" ]
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
