@@ -68,7 +68,7 @@ def list_proc(syst_list, MC_proc, all_proc_bkg, name_syst) :
     elif syst_list["proc"] in [ "ttHproc", "tHqproc", "tHWproc", "HHproc", "ggHproc", "qqHproc", "VHproc" ]:
         proc_signal_plus_data_bkg = list(set(MC_proc) - set(all_proc_bkg))
         proc_pfx = ('WH_', 'ZH_') if syst_list["proc"] == "VHproc" else '{}_'.format(syst_list["proc"].replace('proc', ''))
-        procs = [ proc for proc in proc_signal_plus_data_bkg if proc.startswith(proc_pfx) and not proc.endswith(('FWDH', 'PTH_fwd')) ]
+        procs = [ proc for proc in proc_signal_plus_data_bkg if proc.startswith(proc_pfx) and not ('FWDH' in proc or 'PTH_fwd' in proc) ]
         if not procs:
             print("Skipping {} because unable to find processes that start with {} from: {}".format(
                 name_syst, proc_pfx, ', '.join(proc_signal_plus_data_bkg),
