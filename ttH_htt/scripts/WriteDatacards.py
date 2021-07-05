@@ -36,6 +36,7 @@ parser.add_option("--HH_kin",         action="store_true", dest="HH_kin",      h
 parser.add_option("--stxs",           action="store_true", dest="stxs",        help="Cards for stxs", default=False)
 parser.add_option("--disable-FRxt",   action="store_true", dest="disable_FRxt",help="Disable FRet and FRmt systematics in 2lss+1tau and 3l+1tau", default=False)
 parser.add_option("--minimal-patch",  action="store_true", dest="minimal_patch",help="Minimal changes wrt published datacards", default=False)
+parser.add_option("--disable-thu",    action="store_true", dest="disable_thu", help="If set, excludes THU from all Higgs processes", default=False)
 parser.add_option("--stxs-as-bkg",    action="store_true", dest="stxs_as_bkg", help="Consider STXS-binned ggH, qqH, WH, ZH as background", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
@@ -62,7 +63,8 @@ fake_mc      = options.fake_mc
 no_data      = options.no_data
 stxs         = options.stxs
 disable_FRxt = options.disable_FRxt
-minimal_patch=options.minimal_patch
+minimal_patch= options.minimal_patch
+disable_thu  = options.disable_thu
 stxs_as_bkg  = options.stxs_as_bkg
 tH_kin       = options.tH_kin
 HH_kin       = options.HH_kin
@@ -486,19 +488,20 @@ if shape :
     #    print ("added " + MC_shape_syst + " as shape uncertainty to the MC processes")
     ########################################
     # channel specific estimated shape syst
-    if not stxs or minimal_patch:
+    if not stxs or minimal_patch or disable_thu:
         # these nuisances were not present in the original STXS-inclusive datacards
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ggH"]["channels"] = []
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_qqH"]["channels"] = []
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_VH"]["channels"] = []
-        if minimal_patch:
+        if minimal_patch or disable_thu:
             # we want to keep these NPs in case we want to produce fully patched STXS-inclusive cards
             # but exclude them when producing minimally patched cards
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttH"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHq"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHW"]["channels"] = []
             specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_HH"]["channels"] = []
-            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttW"]["proc"] = [ "TTW", "TTWW" ]
+            if minimal_patch:
+                specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttW"]["proc"] = [ "TTW", "TTWW" ]
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
     for specific_syst in specific_shape_systs :
@@ -635,7 +638,7 @@ if shape :
         #if "HEM" in specific_syst and stxs :
         #    continue
 
-        if stxs and specific_syst.startswith("CMS_ttHl_thu_shape") and specific_syst.endswith(("ttH", "ggH", "qqH", "VH")):
+        if stxs and specific_syst.startswith("CMS_ttHl_thu_shape") and specific_syst.endswith(("ttH", "ggH", "qqH", "VH")) and not disable_thu:
             stxs_groups = {}
             procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst, minimal_patch)
             for proc in procs:
