@@ -486,11 +486,18 @@ if shape :
     #    print ("added " + MC_shape_syst + " as shape uncertainty to the MC processes")
     ########################################
     # channel specific estimated shape syst
-    if not stxs:
+    if not stxs or minimal_patch:
         # these nuisances were not present in the original STXS-inclusive datacards
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ggH"]["channels"] = []
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_qqH"]["channels"] = []
         specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_VH"]["channels"] = []
+        if minimal_patch:
+            # we want to keep these NPs in case we want to produce fully patched STXS-inclusive cards
+            # but exclude them when producing minimally patched cards
+            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttH"]["channels"] = []
+            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHq"]["channels"] = []
+            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_tHW"]["channels"] = []
+            specific_syst_list["specific_shape"]["CMS_ttHl_thu_shape_ttW"]["proc"] = [ "TTW", "TTWW" ]
     specific_shape_systs = specific_syst_list["specific_shape"]
     print("specific_shape_systs", specific_syst_list['specific_shape_to_shape_systs'])
     for specific_syst in specific_shape_systs :
