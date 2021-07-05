@@ -528,7 +528,7 @@ if shape :
         #    applyTo = MC_proc
         #else :
         #    applyTo = specific_shape_systs[specific_syst]["proc"]
-        procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+        procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst, minimal_patch)
         # that above take the overlap of the lists
         if len(procs) == 0 :
             continue
@@ -544,7 +544,7 @@ for specific_syst in specific_ln_systs :
     if channel not in specific_ln_systs[specific_syst]["channels"] :
         print ("Skipped ", specific_syst , " in ", channel)
         continue
-    procs = list_proc(specific_ln_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+    procs = list_proc(specific_ln_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst, minimal_patch)
     if len(procs) == 0 :
         continue
     name_syst = specific_syst
@@ -629,7 +629,7 @@ if shape :
 
         if stxs and specific_syst.startswith("CMS_ttHl_thu_shape") and specific_syst.endswith(("ttH", "ggH", "qqH", "VH")):
             stxs_groups = {}
-            procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+            procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst, minimal_patch)
             for proc in procs:
                 proc_found = False
                 for stxs_proc in stxs_group_map:
@@ -650,7 +650,7 @@ if shape :
         if specific_shape_systs[specific_syst]["correlated"] and specific_shape_systs[specific_syst]["renameTo"] == None :
             continue
         #################
-        procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst)
+        procs = list_proc(specific_shape_systs[specific_syst], MC_proc, bkg_proc_from_data + bkg_procs_from_MC, specific_syst, minimal_patch)
         # that above take the overlap of the lists
         if len(procs) == 0 :
             continue
