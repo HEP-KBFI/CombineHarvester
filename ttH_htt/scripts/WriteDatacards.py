@@ -12,6 +12,7 @@ import os.path
 from os import path
 
 from CombineHarvester.ttH_htt.data_manager import manipulate_cards, lists_overlap, construct_templates, list_proc, make_threshold, checkSyst, check_systematics, rescale_stxs_pT_bins
+from CombineHarvester.ttH_htt.list_syst_stxs import stxs_mig_syst
 sys.stdout.flush()
 
 from optparse import OptionParser
@@ -37,6 +38,7 @@ parser.add_option("--stxs",           action="store_true", dest="stxs",        h
 parser.add_option("--disable-FRxt",   action="store_true", dest="disable_FRxt",help="Disable FRet and FRmt systematics in 2lss+1tau and 3l+1tau", default=False)
 parser.add_option("--minimal-patch",  action="store_true", dest="minimal_patch",help="Minimal changes wrt published datacards", default=False)
 parser.add_option("--disable-thu",    action="store_true", dest="disable_thu", help="If set, excludes THU from all Higgs processes", default=False)
+parser.add_option("--add-mig-unc",    action="store_true", dest="add_mig_unc", help="Add migration uncertainties between STXS bins", default=False)
 parser.add_option("--stxs-as-bkg",    action="store_true", dest="stxs_as_bkg", help="Consider STXS-binned ggH, qqH, WH, ZH as background", default=False)
 parser.add_option("--forceModifyShapes",           action="store_true", dest="forceModifyShapes",        help="if file with modified shapes exist, delete it.", default=False)
 
@@ -65,6 +67,7 @@ stxs         = options.stxs
 disable_FRxt = options.disable_FRxt
 minimal_patch= options.minimal_patch
 disable_thu  = options.disable_thu
+add_mig_unc  = options.add_mig_unc
 stxs_as_bkg  = options.stxs_as_bkg
 tH_kin       = options.tH_kin
 HH_kin       = options.HH_kin
@@ -402,6 +405,15 @@ for specific_syst in theory_ln_Syst :
         specific_syst_use = specific_syst
     cb.cp().process(procs).AddSyst(cb,  specific_syst_use, "lnN", ch.SystMap()(theory_ln_Syst[specific_syst]["value"]))
     print ("added " + specific_syst + " with value " + str(theory_ln_Syst[specific_syst]["value"]) + " to processes: ", procs)
+
+if stxs and add_mig_unc:
+    decays = list_channels(analysis, fake_mc, minimal_patch)["decays"]
+    for syst_name in stxs_mig_syst:
+        for proc in stxs_mig_syst[syst_name]:
+            proc_wdecays = [ proc + decay for decay in decays ]
+            syst_val = stxs_mig_syst[syst_name][proc]
+            cb.cp().process(proc_wdecays).AddSyst(cb,  syst_name, "lnN", ch.SystMap()(syst_val))
+            print("Added {} to processes {} with value {}".format(syst_name, proc, syst_val))
 
 if analysis == "HH" :
 

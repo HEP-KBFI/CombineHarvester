@@ -169,7 +169,7 @@ for channel in $channels; do
     merge_htxs_output_mod_txt=$resultsdir/${merge_htxs_output_base}_mod.txt
 
     set -x
-    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs \
+    /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --add-mig-unc \
       --inputShapes $merge_htxs_output --channel $subchannel \
       --cardFolder $resultsdir \
       --noX_prefix --forceModifyShapes &> $logdir/out_$subchannel.log
@@ -190,7 +190,7 @@ for channel in $channels; do
       # rerunning with --minimal-patch
       # also consider: --disable-FRxt
       set -x
-      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --minimal-patch \
+      /usr/bin/time --verbose WriteDatacards.py --era $era --shapeSyst --stxs --add-mig-unc --minimal-patch \
         --inputShapes $merge_htxs_output --channel $subchannel \
         --cardFolder $resultsdir \
         --noX_prefix --forceModifyShapes &> $logdir/out_${subchannel}_minimal.log
